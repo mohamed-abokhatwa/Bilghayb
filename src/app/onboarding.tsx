@@ -10,6 +10,7 @@ import { useApp } from '../lib/store';
 import { COUNTRIES } from '../lib/content';
 import type { Locale } from '../lib/i18n';
 import { scheduleReminders } from '../lib/notifications';
+import { isValidName } from '../lib/moderation';
 
 const STEPS = 4;
 
@@ -116,8 +117,8 @@ export default function Onboarding() {
                 autoCorrect={false}
                 returnKeyType="done"
               />
-              <Txt v="small" style={{ marginTop: 6, marginBottom: space.lg }}>
-                {t('yourNameHint')}
+              <Txt v="small" style={{ marginTop: 6, marginBottom: space.lg, color: isValidName(name) ? colors.textMuted : colors.danger }}>
+                {isValidName(name) ? t('yourNameHint') : t('errName')}
               </Txt>
 
               <Txt v="label" style={{ marginBottom: space.sm }}>
@@ -148,7 +149,12 @@ export default function Onboarding() {
       </ScrollView>
 
       <View style={{ padding: space.lg, paddingBottom: insets.bottom + space.lg }}>
-        <GoldButton label={step === STEPS - 1 ? t('begin') : t('continue')} onPress={next} loading={busy} />
+        <GoldButton
+          label={step === STEPS - 1 ? t('begin') : t('continue')}
+          onPress={next}
+          loading={busy}
+          disabled={step === STEPS - 1 && !isValidName(name)}
+        />
       </View>
     </View>
   );

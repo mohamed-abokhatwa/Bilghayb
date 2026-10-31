@@ -5,7 +5,7 @@ import { Card, Chip, GoldButton, Ornament, Row, Screen, Txt, haptic } from '../.
 import { colors, fonts, radius, space } from '../../theme';
 import { useApp } from '../../lib/store';
 import { CATEGORIES, type Category, type NeedKind, type SubmitResult } from '../../lib/types';
-import { MAX_LEN, checkNeedText } from '../../lib/moderation';
+import { MAX_LEN, checkNeedText, isValidName } from '../../lib/moderation';
 import type { StringKey } from '../../lib/i18n';
 
 const ERR: Record<Exclude<SubmitResult, { ok: true }>['reason'], StringKey> = {
@@ -33,9 +33,10 @@ export default function AskScreen() {
 
   // Instant feedback for contact info / links while typing (length errors only on submit).
   const liveIssue = useMemo(() => {
+    if (kind === 'janazah' && !isValidName(deceased)) return 'errName' as StringKey;
     const i = checkNeedText(body);
     return i && i !== 'too_short' ? ERR[i] : null;
-  }, [body]);
+  }, [body, deceased, kind]);
 
   const submit = async () => {
     setError(null);

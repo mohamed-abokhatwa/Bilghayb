@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { Api, Profile } from './api';
 import type { Need, NewNeedInput, PilgrimTrip, ReportReason, Stats, SubmitResult, Today } from '../lib/types';
-import { checkNeedText } from '../lib/moderation';
+import { checkNeedText, checkShortText } from '../lib/moderation';
 
 // Row shape of the needs_public view / RPC results.
 interface NeedRow {
@@ -130,6 +130,7 @@ export class SupabaseApi implements Api {
   }
 
   async markAnswered(needId: string, note: string | null) {
+    if (note && checkShortText(note, 280)) throw new Error('contact');
     const { error } = await this.sb.rpc('mark_answered', { p_need: needId, p_note: note ?? '' });
     if (error) throw error;
   }

@@ -16,24 +16,16 @@ const cors = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Same rules as the app (src/lib/moderation.ts). Never trust the client.
-const LINK = /(https?:\/\/|www\.|\b[a-z0-9-]+\.(com|net|org|io|me|ly|co|link|app)\b)/i;
-const CONTACT = [/[^\s@]+@[^\s@]+\.[^\s@]+/, /(^|\s)@[a-z0-9_.]{3,}/i, /([0-9٠-٩][\s\-.]?){7,}/];
-const MONEY = /(paypal|western union|bank account|iban|venmo|cashapp|gofundme|donate|bitcoin|crypto|transfer money|send money|تحويل|حساب بنكي|تبرع)/i;
+// Same rules as the app (copied from src/lib/moderation.ts). Never trust the client.
+import { checkNeedText, isValidName } from '../_shared/moderation.ts';
 
 function ruleCheck(text: string): string | null {
-  const t = text.trim();
-  if (t.length < 12) return 'too_short';
-  if (t.length > 280) return 'too_long';
-  if (LINK.test(t)) return 'link';
-  if (CONTACT.some((r) => r.test(t))) return 'contact';
-  if (MONEY.test(t)) return 'money';
-  return null;
+  return checkNeedText(text);
 }
 
 const SYSTEM = `You moderate short prayer (dua) requests for a Muslim app where strangers pray for each other anonymously.
 ALLOW: sincere requests about health, family, work, studies, grief, faith, marriage, debt relief, the deceased. Sad or heavy topics are fine.
-BLOCK: requests for money or contact; advertising; hate, insults, sexual content; mocking religion; personal data that identifies someone (full name + location, addresses, IDs); requests to curse or harm someone.
+BLOCK: any contact details or ways to reach the writer (phone numbers in any form including spelled out, emails, usernames, messaging apps, social media, "contact me"); requests for money; advertising; hate, insults, sexual content; mocking religion; personal data that identifies someone (full name + location, addresses, IDs); requests to curse or harm someone.
 If the message suggests the writer may harm themselves, reply SELF_HARM (it will still be shown, with support resources).
 Reply with exactly one word: ALLOW, BLOCK, or SELF_HARM.`;
 
@@ -92,7 +84,10 @@ Deno.serve(async (req) => {
   const firstName = typeof body.firstName === 'string' ? body.firstName.trim().slice(0, 40) || null : null;
   const deceased = kind === 'janazah' && typeof body.deceasedName === 'string' ? body.deceasedName.trim().slice(0, 80) : null;
 
-  const rule = ruleCheck(text) ?? (firstName ? ruleCheck(firstName + ' is ok here') : null);
+  const rule =
+    ruleCheck(text) ??
+    (firstName && !isValidName(firstName) ? 'contact' : null) ??
+    (deceased && !isValidName(deceased) ? 'contact' : null);
   if (rule) return json({ ok: false, reason: rule });
 
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);

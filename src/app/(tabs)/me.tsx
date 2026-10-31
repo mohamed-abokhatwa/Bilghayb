@@ -8,6 +8,7 @@ import { Sheet } from '../../components/Sheet';
 import { colors, fonts, radius, space } from '../../theme';
 import { useApp, useLoad } from '../../lib/store';
 import { scheduleReminders } from '../../lib/notifications';
+import { checkShortText } from '../../lib/moderation';
 import type { Need } from '../../lib/types';
 
 const SPONSOR_URL = 'https://example.org/sponsor-bilghayb';
@@ -41,8 +42,9 @@ export default function MeScreen() {
     ]);
   };
 
+  const noteIssue = note ? checkShortText(note, 280) : null;
   const saveAnswered = async () => {
-    if (!answering) return;
+    if (!answering || noteIssue) return;
     haptic.success();
     await api.markAnswered(answering.id, note);
     setAnswering(null);
@@ -172,7 +174,12 @@ export default function MeScreen() {
           multiline
           style={[styles.input, { textAlign: rtl ? 'right' : 'left', fontFamily: rtl ? fonts.arabic : fonts.body }]}
         />
-        <GoldButton label={t('confirm')} onPress={saveAnswered} style={{ marginTop: space.md }} />
+        {noteIssue ? (
+          <Txt v="small" style={{ color: colors.danger, marginTop: 6 }}>
+            {noteIssue === 'contact' || noteIssue === 'link' ? t('errContact') : t('errAbuse')}
+          </Txt>
+        ) : null}
+        <GoldButton label={t('confirm')} onPress={saveAnswered} disabled={!!noteIssue} style={{ marginTop: space.md }} />
       </Sheet>
     </Screen>
   );

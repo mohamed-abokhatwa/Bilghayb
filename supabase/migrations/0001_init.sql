@@ -3,6 +3,21 @@
 
 create extension if not exists pgcrypto;
 
+-- Contact details are never allowed anywhere (mirrors src/lib/moderation.ts).
+create or replace function public.has_contact_info(t text)
+returns boolean language sql immutable as $$
+  select t is not null and (
+    t ~ '[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+'
+    or t ~ '(^|[[:space:]])@[^[:space:]]{2,}'
+    or t ~ '([0-9٠-٩۰-۹][[:space:]().\-/]*){6,}'
+    or t ~ '\+[[:space:]]*[0-9٠-٩]{2,}'
+    or t ~* '(https?://|www\.|whats ?app|wa\.me|telegram|t\.me|viber|snap ?chat|instagram|facebook|messenger|tik ?tok|twitter|linkedin|discord|skype|wechat)'
+    or t ~ '(واتس|وتساب|تلغرام|تليجرام|سناب|انستا|انستقرام|فيسبوك|تويتر|تيك توك|ماسنجر)'
+    or t ~* '(call me|text me|message me|dm me|contact me|my number|my phone|my email)'
+    or t ~ '(كلموني|كلمني|راسلوني|راسلني|تواصلوا|تواصل معي|رقمي|رقم جوالي|ايميلي)'
+  );
+$$;
+
 -- ───────────────────────── Tables ─────────────────────────
 
 create table public.profiles (
@@ -30,6 +45,11 @@ create table public.needs (
   deceased_name text check (char_length(deceased_name) <= 80),
   status text not null default 'open' check (status in ('open','answered')),
   answered_note text check (char_length(answered_note) <= 280),
+  constraint needs_no_contact check (
+    not has_contact_info(body) and not has_contact_info(answered_note)
+    and (first_name is null or first_name ~ '^[[:alpha:][:space:]''.-]+$')
+    and (deceased_name is null or deceased_name ~ '^[[:alpha:][:space:]''.-]+$')
+  ),
   answered_at timestamptz,
   prayed_count integer not null default 0,
   report_count integer not null default 0,
@@ -236,10 +256,12 @@ returns json language sql stable security definer set search_path = public as $$
 $$;
 
 create or replace function public.mark_answered(p_need uuid, p_note text)
-returns void language sql security definer set search_path = public as $$
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  if has_contact_info(p_note) then raise exception 'contact details are not allowed'; end if;
   update needs set status = 'answered', answered_note = nullif(trim(p_note), ''), answered_at = now()
   where id = p_need and author_id = auth.uid();
-$$;
+end $$;
 
 create or replace function public.janazah_list()
 returns table (id uuid, first_name text, gender char, country char, category text, body text,

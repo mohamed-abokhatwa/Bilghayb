@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Api, Profile } from './api';
 import { localDay } from './api';
 import type { Need, NewNeedInput, PilgrimTrip, Stats, SubmitResult, Today } from '../lib/types';
-import { checkNeedText } from '../lib/moderation';
+import { checkNeedText, checkShortText, isValidName } from '../lib/moderation';
 import { SEED_NEEDS } from './seed';
 
 // Fully working offline backend so the app is usable before Supabase is set up.
@@ -155,7 +155,10 @@ export class DemoApi implements Api {
 
   async submitNeed(input: NewNeedInput): Promise<SubmitResult> {
     await this.load();
-    const issue = checkNeedText(input.body);
+    const issue =
+      checkNeedText(input.body) ??
+      (input.firstName && !isValidName(input.firstName) ? 'contact' : null) ??
+      (input.deceasedName && !isValidName(input.deceasedName) ? 'contact' : null);
     if (issue) return { ok: false, reason: issue };
     const day = localDay();
     const count = this.state.submissions[day] ?? 0;
@@ -189,6 +192,7 @@ export class DemoApi implements Api {
 
   async markAnswered(needId: string, note: string | null) {
     await this.load();
+    if (note && checkShortText(note, 280)) throw new Error('contact');
     const n = this.state.needs.find((x) => x.id === needId && x.isMine);
     if (n) {
       n.status = 'answered';
