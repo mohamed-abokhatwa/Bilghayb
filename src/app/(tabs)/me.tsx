@@ -1,0 +1,228 @@
+import { router } from 'expo-router';
+import { useState } from 'react';
+import { Alert, Linking, Platform, Pressable, StyleSheet, Switch, TextInput } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Card, Divider, GoldButton, Loader, Row, Screen, Txt, haptic } from '../../components/ui';
+import { NeedCard } from '../../components/NeedCard';
+import { Sheet } from '../../components/Sheet';
+import { colors, fonts, radius, space } from '../../theme';
+import { useApp, useLoad } from '../../lib/store';
+import { scheduleReminders } from '../../lib/notifications';
+import type { Need } from '../../lib/types';
+
+const SPONSOR_URL = 'https://example.org/sponsor-bilghayb';
+
+export default function MeScreen() {
+  const { t, api, prefs, setPrefs, setProfile, reset, locale, touch, rtl } = useApp();
+  const needs = useLoad((a) => a.myNeeds());
+  const stats = useLoad((a) => a.getStats());
+  const [answering, setAnswering] = useState<Need | null>(null);
+  const [note, setNote] = useState('');
+
+  const toggle = async (key: 'notifMorning' | 'notifSpecial', v: boolean) => {
+    await setPrefs({ [key]: v });
+    const m = key === 'notifMorning' ? v : prefs.notifMorning;
+    const s = key === 'notifSpecial' ? v : prefs.notifSpecial;
+    scheduleReminders(locale, m, s).catch(() => {});
+  };
+
+  const confirmDelete = () => {
+    const run = async () => {
+      await reset();
+      router.replace('/onboarding');
+    };
+    if (Platform.OS === 'web') {
+      if (globalThis.confirm?.(t('deleteConfirm'))) run();
+      return;
+    }
+    Alert.alert(t('deleteAccount'), t('deleteConfirm'), [
+      { text: t('cancel'), style: 'cancel' },
+      { text: t('delete'), style: 'destructive', onPress: run },
+    ]);
+  };
+
+  const saveAnswered = async () => {
+    if (!answering) return;
+    haptic.success();
+    await api.markAnswered(answering.id, note);
+    setAnswering(null);
+    setNote('');
+    touch();
+  };
+
+  const s = stats.data;
+
+  return (
+    <Screen>
+      <Txt v="label">{t('tabMe')}</Txt>
+      <Txt v="title" style={{ marginTop: 4 }}>
+        {t('meTitle')}
+      </Txt>
+
+      <Row style={{ marginTop: space.lg }} gap={space.md}>
+        <Stat n={s?.myPrayersTotal ?? 0} label={t('totalPrayers')} />
+        <Stat n={s?.prayedForMeTotal ?? 0} label={t('totalForYou')} />
+        <Stat n={s?.streak ?? 0} label={t('streak')} />
+      </Row>
+      <Txt v="small" center style={{ marginTop: space.sm, fontSize: 11, color: colors.textFaint }}>
+        {t('streakPrivate')}
+      </Txt>
+
+      <Txt v="heading" style={{ marginTop: space.xl, marginBottom: space.md }}>
+        {t('myNeeds')}
+      </Txt>
+      {needs.loading && !needs.data ? (
+        <Loader />
+      ) : needs.data?.length ? (
+        needs.data.map((n) => (
+          <NeedCard
+            key={n.id}
+            need={n}
+            showAnswer
+            footer={
+              <Row style={{ justifyContent: 'space-between' }}>
+                <Row gap={6}>
+                  <Ionicons name={n.status === 'answered' ? 'checkmark-circle' : 'heart'} size={14} color={colors.gold} />
+                  <Txt v="small" style={{ color: colors.gold }}>
+                    {n.status === 'answered' ? t('answered') : t('prayedTimes', { n: n.prayedCount })}
+                  </Txt>
+                </Row>
+                {n.status === 'open' && n.kind === 'need' && (
+                  <Pressable onPress={() => setAnswering(n)} style={styles.smallBtn} accessibilityRole="button">
+                    <Txt v="small" style={{ color: colors.goldBright }}>
+                      {t('markAnswered')}
+                    </Txt>
+                  </Pressable>
+                )}
+              </Row>
+            }
+          />
+        ))
+      ) : (
+        <Card>
+          <Txt v="small" center>
+            {t('noNeeds')}
+          </Txt>
+          <GoldButton label={t('askTitle')} variant="outline" onPress={() => router.navigate('/(tabs)/ask')} style={{ marginTop: space.md }} />
+        </Card>
+      )}
+
+      <Txt v="heading" style={{ marginTop: space.xl, marginBottom: space.md }}>
+        {t('settings')}
+      </Txt>
+      <Card>
+        <Row style={{ justifyContent: 'space-between' }}>
+          <Txt>{t('language')}</Txt>
+          <Row gap={6}>
+            {(['en', 'ar'] as const).map((l) => (
+              <Pressable
+                key={l}
+                onPress={() => {
+                  haptic.select();
+                  setProfile({ locale: l });
+                  scheduleReminders(l, prefs.notifMorning, prefs.notifSpecial).catch(() => {});
+                }}
+                style={[styles.lang, locale === l && styles.langActive]}
+              >
+                <Txt style={{ fontSize: 14, color: locale === l ? colors.bgDeep : colors.text }}>
+                  {l === 'en' ? 'English' : 'العربية'}
+                </Txt>
+              </Pressable>
+            ))}
+          </Row>
+        </Row>
+        <Divider />
+        <Txt v="label" style={{ marginBottom: space.sm }}>
+          {t('notifications')}
+        </Txt>
+        <ToggleRow label={t('notifMorning')} value={prefs.notifMorning} onChange={(v) => toggle('notifMorning', v)} />
+        <ToggleRow label={t('notifSpecial')} value={prefs.notifSpecial} onChange={(v) => toggle('notifSpecial', v)} />
+        <Divider />
+        <Txt v="label" style={{ marginBottom: space.sm }}>
+          {t('privacy')}
+        </Txt>
+        <Txt v="small">{t('privacyBody')}</Txt>
+        <Divider />
+        <Txt v="label" style={{ marginBottom: space.sm }}>
+          {t('about')}
+        </Txt>
+        <Txt v="small">{t('aboutBody')}</Txt>
+        <GoldButton label={t('sponsor')} variant="outline" onPress={() => Linking.openURL(SPONSOR_URL)} style={{ marginTop: space.md }} />
+      </Card>
+
+      <Pressable onPress={confirmDelete} style={{ paddingVertical: space.lg }} accessibilityRole="button">
+        <Txt v="small" center style={{ color: colors.danger }}>
+          {t('deleteAccount')}
+        </Txt>
+      </Pressable>
+      <Txt v="small" center style={{ fontSize: 11, color: colors.textFaint }}>
+        {t('appName')} · v1.0 · {api.mode}
+      </Txt>
+
+      <Sheet visible={!!answering} onClose={() => setAnswering(null)} title={t('alhamdulillah')}>
+        <Txt v="small" center style={{ marginBottom: space.md }}>
+          {answering?.body}
+        </Txt>
+        <TextInput
+          value={note}
+          onChangeText={setNote}
+          placeholder={t('answeredNotePlaceholder')}
+          placeholderTextColor={colors.textFaint}
+          maxLength={280}
+          multiline
+          style={[styles.input, { textAlign: rtl ? 'right' : 'left', fontFamily: rtl ? fonts.arabic : fonts.body }]}
+        />
+        <GoldButton label={t('confirm')} onPress={saveAnswered} style={{ marginTop: space.md }} />
+      </Sheet>
+    </Screen>
+  );
+}
+
+function Stat({ n, label }: { n: number; label: string }) {
+  return (
+    <Card style={{ flex: 1 }}>
+      <Txt v="number" center style={{ fontSize: 26, lineHeight: 32 }}>
+        {n}
+      </Txt>
+      <Txt v="small" center style={{ fontSize: 11, lineHeight: 15 }}>
+        {label}
+      </Txt>
+    </Card>
+  );
+}
+
+function ToggleRow({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <Row style={{ justifyContent: 'space-between', paddingVertical: 6 }}>
+      <Txt style={{ flex: 1, fontSize: 15 }}>{label}</Txt>
+      <Switch
+        value={value}
+        onValueChange={onChange}
+        trackColor={{ true: colors.goldDeep, false: colors.surfaceRaised }}
+        thumbColor={value ? colors.goldBright : colors.textMuted}
+      />
+    </Row>
+  );
+}
+
+const styles = StyleSheet.create({
+  smallBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.lineStrong,
+  },
+  lang: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.line },
+  langActive: { backgroundColor: colors.gold, borderColor: colors.gold },
+  input: {
+    minHeight: 90,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.line,
+    color: colors.ivory,
+    padding: space.md,
+    fontSize: 16,
+    textAlignVertical: 'top',
+  },
+});

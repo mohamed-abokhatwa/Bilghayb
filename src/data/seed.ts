@@ -1,0 +1,82 @@
+import type { Need } from '../lib/types';
+
+const ago = (h: number) => new Date(Date.now() - h * 36e5).toISOString();
+
+let i = 0;
+const n = (p: Partial<Need> & Pick<Need, 'country' | 'category' | 'body'>): Need => ({
+  id: `seed-${++i}`,
+  kind: 'need',
+  firstName: null,
+  gender: null,
+  createdAt: ago(i * 5),
+  prayedCount: (i * 7) % 23,
+  status: 'open',
+  ...p,
+});
+
+// Sample content for demo mode only.
+export const SEED_NEEDS: Need[] = [
+  n({ firstName: 'Amina', gender: 'f', country: 'EG', category: 'health', body: 'My mother has heart surgery on Thursday. Please pray that Allah guides the doctors’ hands and grants her full recovery.', prayedCount: 2 }),
+  n({ firstName: 'Yusuf', gender: 'm', country: 'GB', category: 'guidance', body: 'I took my shahada three months ago and my family does not speak to me. Pray that Allah keeps me firm and softens their hearts.', prayedCount: 0 }),
+  n({ gender: 'f', country: 'ID', category: 'children', body: 'Seven years of marriage and we long for a child. Please ask Allah to bless us with righteous offspring.' }),
+  n({ firstName: 'Omar', gender: 'm', country: 'PK', category: 'rizq', body: 'Lost my job last month and I support my parents and two sisters. Pray Allah opens a halal door for me soon.' }),
+  n({ firstName: 'Mariam', gender: 'f', country: 'MA', category: 'exams', body: 'My medical board exams are next week. Pray for clarity, calm and success so I can serve people.' }),
+  n({ gender: 'm', country: 'SD', category: 'family', body: 'My family was displaced by the war. Pray that Allah keeps them safe and reunites us soon.' }),
+  n({ firstName: 'Fatima', gender: 'f', country: 'MY', category: 'grief', body: 'I lost my baby at 20 weeks. My heart is broken. Pray Allah grants me sabr and makes her a means for my Jannah.' }),
+  n({ firstName: 'Ibrahim', gender: 'm', country: 'TR', category: 'debt', body: 'My small shop is drowning in debt after a bad year. Pray Allah relieves me and gives barakah in my trade.' }),
+  n({ gender: 'f', country: 'US', category: 'marriage', body: 'Pray that Allah blesses me with a righteous spouse who helps me become closer to Him.' }),
+  n({ firstName: 'Khalid', gender: 'm', country: 'SA', category: 'health', body: 'Diagnosed with depression. Some days are very heavy. Please pray for light in my heart.' }),
+  n({ firstName: 'Aisha', gender: 'f', country: 'NG', category: 'exams', body: 'First in my family to go to university. Finals start Monday, please pray for me.' }),
+  n({ gender: 'm', country: 'FR', category: 'guidance', body: 'Pray that Allah helps me stop a bad habit and return to Him sincerely.' }),
+  n({
+    kind: 'janazah',
+    firstName: 'Hassan',
+    gender: 'm',
+    country: 'JO',
+    category: 'grief',
+    deceasedName: 'Mahmoud Al-Khatib',
+    body: 'My father returned to Allah last night. He prayed every Fajr in the masjid for forty years. Please pray for his forgiveness.',
+    prayedCount: 412,
+  }),
+  n({
+    kind: 'janazah',
+    gender: 'f',
+    country: 'BD',
+    category: 'grief',
+    deceasedName: 'Rahima Begum',
+    body: 'Our grandmother passed away after a long illness. Pray Allah makes her grave a garden of Jannah.',
+    prayedCount: 188,
+  }),
+  n({
+    status: 'answered',
+    firstName: 'Zainab',
+    gender: 'f',
+    country: 'AE',
+    category: 'health',
+    body: 'My son was in the ICU after an accident. Please pray for him.',
+    answeredNote: 'He walked out of hospital today. Jazakum Allahu khayran to every stranger who prayed.',
+    answeredAt: ago(6),
+    prayedCount: 318,
+  }),
+  n({
+    status: 'answered',
+    gender: 'm',
+    country: 'CA',
+    category: 'rizq',
+    body: 'Unemployed for eight months. Please pray for me.',
+    answeredNote: 'Signed my offer letter this morning. Alhamdulillah.',
+    answeredAt: ago(30),
+    prayedCount: 204,
+  }),
+  n({
+    status: 'answered',
+    firstName: 'Salma',
+    gender: 'f',
+    country: 'DZ',
+    category: 'children',
+    body: 'Ten years waiting for a child.',
+    answeredNote: 'Our daughter was born on the 27th night of Ramadan. Allahu Akbar.',
+    answeredAt: ago(80),
+    prayedCount: 977,
+  }),
+];
