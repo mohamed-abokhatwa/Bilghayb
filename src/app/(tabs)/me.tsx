@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Linking, Platform, Pressable, StyleSheet, Switch, TextInput } from 'react-native';
+import { Alert, Platform, Pressable, StyleSheet, Switch, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, Divider, GoldButton, Loader, Row, Screen, Txt, haptic } from '../../components/ui';
 import { NeedCard } from '../../components/NeedCard';
@@ -10,8 +10,6 @@ import { useApp, useLoad } from '../../lib/store';
 import { scheduleReminders } from '../../lib/notifications';
 import { checkShortText } from '../../lib/moderation';
 import type { Need } from '../../lib/types';
-
-const SPONSOR_URL = 'https://example.org/sponsor-bilghayb';
 
 export default function MeScreen() {
   const { t, api, prefs, setPrefs, setProfile, reset, locale, touch, rtl } = useApp();
@@ -149,7 +147,6 @@ export default function MeScreen() {
           {t('about')}
         </Txt>
         <Txt v="small">{t('aboutBody')}</Txt>
-        <GoldButton label={t('sponsor')} variant="outline" onPress={() => Linking.openURL(SPONSOR_URL)} style={{ marginTop: space.md }} />
       </Card>
 
       <Pressable onPress={confirmDelete} style={{ paddingVertical: space.lg }} accessibilityRole="button">

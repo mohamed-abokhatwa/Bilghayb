@@ -72,7 +72,6 @@ npx eas-cli@latest submit --platform android
 
 Before you submit:
 - Change `ios.bundleIdentifier` and `android.package` in `app.json` (currently `app.bilghayb`).
-- Replace `SPONSOR_URL` in `src/app/(tabs)/me.tsx` with your donation page.
 - Add a privacy policy URL in both store listings. The app collects only a first name (optional), country and the needs people write.
 - Apple requires apps with user content to offer reporting and blocking (done: the ⋯ menu on each need) and to state a moderation policy.
 
