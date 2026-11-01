@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { Api, Profile } from './api';
 import type { Need, NewNeedInput, PilgrimTrip, ReportReason, Stats, SubmitResult, Today } from '../lib/types';
-import { checkNeedText, checkShortText } from '../lib/moderation';
+import { checkNeedText, checkShortText, suggestsSelfHarm } from '../lib/moderation';
 
 // Row shape of the needs_public view / RPC results.
 interface NeedRow {
@@ -117,7 +117,7 @@ export class SupabaseApi implements Api {
     const { data, error } = await this.sb.functions.invoke('submit-need', { body: input });
     if (error || !data) return { ok: false, reason: 'network' };
     if (!data.ok) return { ok: false, reason: data.reason };
-    return { ok: true, need: toNeed({ ...data.need, is_mine: true }) };
+    return { ok: true, need: toNeed({ ...data.need, is_mine: true }), selfHarm: !!data.selfHarm || suggestsSelfHarm(input.body) };
   }
 
   async myNeeds() {
@@ -204,6 +204,10 @@ export class SupabaseApi implements Api {
 
   async report(needId: string, reason: ReportReason) {
     await this.sb.rpc('report_need', { p_need: needId, p_reason: reason });
+  }
+
+  async block(needId: string) {
+    await this.sb.rpc('block_author', { p_need: needId });
   }
 
   async deleteAccount() {

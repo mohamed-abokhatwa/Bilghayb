@@ -11,6 +11,8 @@ import { scheduleReminders } from '../../lib/notifications';
 import { checkShortText } from '../../lib/moderation';
 import { LANGUAGES } from '../../lib/i18n';
 import { LanguageGrid } from '../../components/Guide';
+import { ExternalLink } from '../../components/ExternalLink';
+import { LINKS, SUPPORT_EMAIL } from '../../lib/links';
 import type { Need } from '../../lib/types';
 
 export default function MeScreen() {
@@ -152,6 +154,22 @@ export default function MeScreen() {
           {t('about')}
         </Txt>
         <Txt v="small">{t('aboutBody')}</Txt>
+        <Row gap={space.lg} style={{ marginTop: space.md, flexWrap: 'wrap' }}>
+          <ExternalLink href={LINKS.privacy} label={t('privacyPolicy')}>
+            <Txt v="small" style={{ color: colors.gold, textDecorationLine: 'underline' }}>{t('privacyPolicy')}</Txt>
+          </ExternalLink>
+          <ExternalLink href={LINKS.terms} label={t('terms')}>
+            <Txt v="small" style={{ color: colors.gold, textDecorationLine: 'underline' }}>{t('terms')}</Txt>
+          </ExternalLink>
+        </Row>
+        <Divider />
+        <Txt v="label" style={{ marginBottom: space.sm }}>
+          {t('support')}
+        </Txt>
+        <Txt v="small">{t('supportBody')}</Txt>
+        <Txt selectable style={{ marginTop: 4, color: colors.goldBright, fontSize: 15 }}>
+          {SUPPORT_EMAIL}
+        </Txt>
       </Card>
 
       <Pressable onPress={confirmDelete} style={{ paddingVertical: space.lg }} accessibilityRole="button">

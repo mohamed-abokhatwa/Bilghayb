@@ -4,11 +4,13 @@ import { Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BackHeader } from '../components/BackHeader';
 import { Card, GoldButton, Loader, Ornament, Row, Screen, Txt, haptic } from '../components/ui';
+import { ReportSheet } from '../components/ReportSheet';
 import { NeedCard } from '../components/NeedCard';
 import { colors, radius, space } from '../theme';
 import { useApp, useLoad } from '../lib/store';
 
 export default function JanazahScreen() {
+  const [reportId, setReportId] = useState<string | null>(null);
   const { t, api, locale } = useApp();
   const list = useLoad((a) => a.janazahList());
   const [prayedNow, setPrayedNow] = useState<Record<string, true>>({});
@@ -55,7 +57,7 @@ export default function JanazahScreen() {
           const done = n.prayedByMe || !!prayedNow[n.id];
           const count = n.prayedCount + (prayedNow[n.id] && !n.prayedByMe ? 1 : 0);
           return (
-            <NeedCard
+            <NeedCard onReport={setReportId}
               key={n.id}
               need={n}
               footer={
@@ -84,6 +86,7 @@ export default function JanazahScreen() {
       )}
 
       <GoldButton label={t('janazahAsk')} variant="outline" onPress={() => router.navigate('/(tabs)/ask')} style={{ marginTop: space.md }} />
+      <ReportSheet needId={reportId} onClose={() => setReportId(null)} />
     </Screen>
   );
 }

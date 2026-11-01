@@ -40,6 +40,8 @@ export interface Api {
   endTrip(tripId: string): Promise<void>;
 
   report(needId: string, reason: ReportReason): Promise<void>;
+  /** Hide everything from the author of this need (they are never revealed). */
+  block(needId: string): Promise<void>;
   deleteAccount(): Promise<void>;
 }
 

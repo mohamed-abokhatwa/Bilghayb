@@ -17,7 +17,7 @@ const cors = {
 };
 
 // Same rules as the app (copied from src/lib/moderation.ts). Never trust the client.
-import { checkNeedText, isValidName } from '../_shared/moderation.ts';
+import { checkNeedText, isValidName, suggestsSelfHarm } from '../_shared/moderation.ts';
 import { detectLang } from '../_shared/language.ts';
 
 function ruleCheck(text: string): string | null {
@@ -126,5 +126,5 @@ Deno.serve(async (req) => {
 
   if (body.sendWithPilgrims) await admin.from('pilgrim_queue').insert({ need_id: need.id });
 
-  return json({ ok: true, need, selfHarm: verdict === 'SELF_HARM' });
+  return json({ ok: true, need, selfHarm: verdict === 'SELF_HARM' || suggestsSelfHarm(text) });
 });

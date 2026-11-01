@@ -1,7 +1,7 @@
 # Privacy Policy · سياسة الخصوصية
 
 **Bil-Ghayb (بالغيب)**
-Effective date: 31 October 2026
+Effective date: 1 November 2026
 
 Bil-Ghayb is a free app where strangers pray (make dua) for each other anonymously. We built it to collect as little as possible. We do not show ads, we do not sell data, and we do not track you across other apps or websites.
 
@@ -17,6 +17,7 @@ Bil-Ghayb is a free app where strangers pray (make dua) for each other anonymous
 | **Needs you write** (dua requests, janazah requests, thank-you notes) | Only if you post | So other users can read them and pray for you. |
 | **Prayers you make** (which need you prayed for, and when) | Yes, when you pray | To count prayers and avoid showing you the same person twice. |
 | **Reports you send** | Only if you report | To review and remove harmful content. |
+| **People you block** | Only if you block | To hide that person's needs from you. They are never told, and you never learn who they are. |
 | **Push notification token** | Only if you allow notifications | To send your morning reminder and special-time reminders. |
 
 We do **not** collect your location, contacts, photos, microphone, camera, advertising ID, or browsing activity.
@@ -37,6 +38,7 @@ New needs are checked automatically before they are shared:
 1. Rules on your device and on our server block contact details, links, money requests and abuse.
 2. The text may be sent to an AI moderation service (Anthropic) to detect harmful content. Only the text of the need is sent, never your account ID, name or country. Anthropic does not use this data to train its models.
 3. Any need reported by 3 different users is hidden until it is reviewed.
+4. If a need suggests the writer may be thinking of self-harm, the app shows them links to free helplines (findahelpline.com). The need is still shared so others can pray for them.
 
 ## 5. Service providers
 
@@ -83,7 +85,7 @@ If we change this policy, we will update the date above and, for important chang
 
 ## 11. Contact
 
-**[YOUR CONTACT EMAIL]**
+**mohamed.abokhatwa@hotmail.com**
 
 ---
 
@@ -96,4 +98,4 @@ If we change this policy, we will update the date above and, for important chang
 - **لا إعلانات** ولا بيع للبيانات ولا تتبع.
 - قد يُرسل نص الحاجة فقط (دون اسمك أو حسابك) إلى خدمة ذكاء اصطناعي (Anthropic) للتحقق من خلوّه من المحتوى المسيء.
 - يمكنك **حذف حسابك وكل بياناتك نهائيًا** بضغطة واحدة من صفحة «أنا».
-- للتواصل: **[YOUR CONTACT EMAIL]**
+- للتواصل: **mohamed.abokhatwa@hotmail.com**

@@ -74,16 +74,16 @@ Caveats of the free plan: a project with **no activity for 7 days is paused** (t
 
 ## Publish to the stores
 
-```bash
-npx eas-cli@latest build --profile production --platform all
-npx eas-cli@latest submit --platform ios
-npx eas-cli@latest submit --platform android
-```
+Follow **[PUBLISHING.md](PUBLISHING.md)**: accounts, database, builds, and submission, step by step.
 
-Before you submit:
-- Change `ios.bundleIdentifier` and `android.package` in `app.json` (currently `app.bilghayb`).
-- Add a privacy policy URL in both store listings. The app collects only a first name (optional), country and the needs people write.
-- Apple requires apps with user content to offer reporting and blocking (done: the ⋯ menu on each need) and to state a moderation policy.
+Ready-made material:
+- `store/STORE_LISTING.md`: names, descriptions (English + Arabic), keywords, privacy and data-safety answers, age rating, reviewer notes
+- `store/screenshots/`: iPhone 6.9", iPad 13" and Android, in English and Arabic
+- `store/assets/`: feature graphic (1024×500) and icons
+- `docs/`: public support, privacy and terms pages for GitHub Pages
+- `PRIVACY.md`, `TERMS.md`
+
+**Store-review safeguards in the app:** terms agreement before first use, contact/money/abuse filters in 10 languages (device, server and database), report and block on every need, automatic hiding after 3 reports, a moderation queue for the owner, helpline resources for self-harm signals, in-app account deletion, support contact in the app, and iPad layout support.
 
 ## Architecture
 
@@ -117,9 +117,10 @@ supabase/
 ## Checks
 
 ```bash
+npm test             # safety filters + language detection (51 checks)
 npx tsc --noEmit     # types
 npx expo lint        # lint
 npx expo-doctor      # config + dependencies
 ```
 
-All three pass.
+All four pass.

@@ -1,22 +1,24 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, Loader, Ornament, Row, Txt } from '../../components/ui';
+import { ReportSheet } from '../../components/ReportSheet';
 import { NeedCard } from '../../components/NeedCard';
-import { colors, gradients, space } from '../../theme';
+import { colors, column, gradients, space } from '../../theme';
 import { useApp, useLoad } from '../../lib/store';
 import type { Need } from '../../lib/types';
 
 export default function AnsweredScreen() {
+  const [reportId, setReportId] = useState<string | null>(null);
   const { t, touch } = useApp();
   const insets = useSafeAreaInsets();
   const { data, loading } = useLoad((a) => a.answeredWall());
 
   const renderItem = useCallback(
     ({ item }: { item: Need }) => (
-      <NeedCard
+      <NeedCard onReport={setReportId}
         need={item}
         showAnswer
         footer={
@@ -42,7 +44,7 @@ export default function AnsweredScreen() {
         initialNumToRender={6}
         windowSize={7}
         removeClippedSubviews
-        contentContainerStyle={{ paddingTop: insets.top + space.md, paddingBottom: insets.bottom + 130, paddingHorizontal: space.lg }}
+        contentContainerStyle={[{ paddingTop: insets.top + space.md, paddingBottom: insets.bottom + 130, paddingHorizontal: space.lg }, column]}
         refreshControl={<RefreshControl tintColor={colors.gold} refreshing={false} onRefresh={touch} />}
         ListHeaderComponent={
           <View style={{ marginBottom: space.md }}>
@@ -68,6 +70,7 @@ export default function AnsweredScreen() {
           )
         }
       />
+      <ReportSheet needId={reportId} onClose={() => setReportId(null)} />
     </View>
   );
 }

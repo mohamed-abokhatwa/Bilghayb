@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BackHeader } from '../components/BackHeader';
 import { Card, Chip, GoldButton, Loader, Ornament, Row, Screen, Txt, haptic } from '../components/ui';
+import { ReportSheet } from '../components/ReportSheet';
 import { NeedCard } from '../components/NeedCard';
 import { colors, radius, space } from '../theme';
 import { useApp, useLoad } from '../lib/store';
@@ -17,6 +18,7 @@ const DEPART_OPTIONS = [0, 3, 7, 14, 30];
 const LENGTH_OPTIONS = [5, 10, 14, 21];
 
 export default function PilgrimScreen() {
+  const [reportId, setReportId] = useState<string | null>(null);
   const { t, api, touch, locale } = useApp();
   const trip = useLoad((a) => a.activeTrip());
   const [kind, setKind] = useState<'umrah' | 'hajj'>('umrah');
@@ -100,7 +102,7 @@ export default function PilgrimScreen() {
 
           <View style={{ marginTop: space.lg }}>
             {trip.data.carrying.map((n) => (
-              <NeedCard key={n.id} need={n} />
+              <NeedCard onReport={setReportId} key={n.id} need={n} />
             ))}
           </View>
 
@@ -151,6 +153,7 @@ export default function PilgrimScreen() {
           <GoldButton label={t('startCarrying')} onPress={start} loading={busy} style={{ marginTop: space.xl }} />
         </Card>
       )}
+      <ReportSheet needId={reportId} onClose={() => setReportId(null)} />
     </Screen>
   );
 }

@@ -6,6 +6,8 @@ import { colors, fonts, radius, space } from '../../theme';
 import { useApp } from '../../lib/store';
 import { CATEGORIES, type Category, type NeedKind, type SubmitResult } from '../../lib/types';
 import { MAX_LEN, checkNeedText, isValidName } from '../../lib/moderation';
+import { ExternalLink } from '../../components/ExternalLink';
+import { LINKS } from '../../lib/links';
 import type { StringKey } from '../../lib/i18n';
 
 const ERR: Record<Exclude<SubmitResult, { ok: true }>['reason'], StringKey> = {
@@ -30,6 +32,7 @@ export default function AskScreen() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<StringKey | null>(null);
   const [done, setDone] = useState(false);
+  const [needsHelp, setNeedsHelp] = useState(false);
 
   // Instant feedback for contact info / links while typing (length errors only on submit).
   const liveIssue = useMemo(() => {
@@ -60,6 +63,7 @@ export default function AskScreen() {
       return;
     }
     haptic.success();
+    setNeedsHelp(!!res.selfHarm);
     setDone(true);
     setBody('');
     setDeceased('');
@@ -80,6 +84,23 @@ export default function AskScreen() {
           <Txt v="quote" center>
             {t('submittedBody')}
           </Txt>
+          {needsHelp && (
+            <Card glow style={{ marginTop: space.xl, alignSelf: 'stretch' }}>
+              <Txt v="heading" center>
+                {t('selfHarmTitle')}
+              </Txt>
+              <Txt v="small" center style={{ marginTop: space.sm }}>
+                {t('selfHarmBody')}
+              </Txt>
+              <View style={{ alignItems: 'center', marginTop: space.md }}>
+                <ExternalLink href={LINKS.helplines} label={t('findHelp')}>
+                  <View style={styles.helpBtn}>
+                    <Txt style={{ color: colors.bgDeep, fontSize: 15 }}>{t('findHelp')}</Txt>
+                  </View>
+                </ExternalLink>
+              </View>
+            </Card>
+          )}
           <GoldButton label={t('continue')} variant="outline" onPress={() => setDone(false)} style={{ marginTop: space.xl }} />
         </View>
       </Screen>
@@ -245,6 +266,12 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
   },
   segmentActive: { backgroundColor: colors.gold, borderColor: colors.gold },
+  helpBtn: {
+    paddingHorizontal: 22,
+    paddingVertical: 12,
+    borderRadius: radius.pill,
+    backgroundColor: colors.gold,
+  },
   doneIcon: {
     width: 96,
     height: 96,

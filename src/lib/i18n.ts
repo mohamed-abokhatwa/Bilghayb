@@ -200,6 +200,16 @@ const en = {
   writtenIn: "Written in {lang}",
   translate: "Translate",
   foreignNote: "You don't need to understand every word. Allah knows their need. You can say:",
+  blockPerson: "Block this person",
+  blockedDone: "Blocked. You won't see their needs again.",
+  agreeTerms: "By beginning, you agree to the Terms of Use. There is zero tolerance for abusive or objectionable content.",
+  terms: "Terms of Use",
+  privacyPolicy: "Privacy Policy",
+  support: "Support",
+  supportBody: "Questions or a problem? Write to us:",
+  selfHarmTitle: "You are not alone",
+  selfHarmBody: "Strangers are already making dua for you. If you are thinking of harming yourself, please talk to someone now: a free helpline, a trusted person, or emergency services.",
+  findHelp: "Find a free helpline",
 };
 
 export type StringKey = keyof typeof en;
@@ -360,6 +370,16 @@ const ar: Record<StringKey, string> = {
   writtenIn: "مكتوبة بـ{lang}",
   translate: "ترجمة",
   foreignNote: "لا يلزمك فهم كل كلمة، فالله يعلم حاجته. يمكنك أن تقول:",
+  blockPerson: "حظر هذا الشخص",
+  blockedDone: "تم الحظر. لن ترى حاجاته مرة أخرى.",
+  agreeTerms: "بالبدء، فإنك توافق على شروط الاستخدام. لا تسامح مطلقًا مع المحتوى المسيء أو غير اللائق.",
+  terms: "شروط الاستخدام",
+  privacyPolicy: "سياسة الخصوصية",
+  support: "الدعم",
+  supportBody: "لديك سؤال أو مشكلة؟ راسلنا:",
+  selfHarmTitle: "لست وحدك",
+  selfHarmBody: "غرباء يدعون لك الآن. إن كنت تفكر في إيذاء نفسك فتحدّث إلى أحد الآن: خط مساعدة مجاني، أو شخص تثق به، أو الطوارئ.",
+  findHelp: "ابحث عن خط مساعدة مجاني",
 };
 
 

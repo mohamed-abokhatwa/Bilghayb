@@ -16,7 +16,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, fonts, gradients, radius, shadow, space } from '../theme';
+import { colors, column, fonts, gradients, radius, shadow, space } from '../theme';
 import { useApp } from '../lib/store';
 
 export const haptic = {
@@ -139,14 +139,14 @@ export function Screen({
       <Glow />
       {scroll ? (
         <ScrollView
-          contentContainerStyle={[pad, contentStyle]}
+          contentContainerStyle={[pad, column, contentStyle]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
           {children}
         </ScrollView>
       ) : (
-        <View style={[styles.fill, pad, contentStyle]}>{children}</View>
+        <View style={[styles.fill, pad, column, contentStyle]}>{children}</View>
       )}
     </View>
   );

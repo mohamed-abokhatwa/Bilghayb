@@ -9,7 +9,7 @@ import { PrayButton } from '../../components/PrayButton';
 import { ReportSheet } from '../../components/ReportSheet';
 import { LangBar } from '../../components/LangBar';
 import { personName } from '../../components/NeedCard';
-import { colors, gradients, radius, space } from '../../theme';
+import { colors, column, gradients, radius, space } from '../../theme';
 import { useApp, useLoad } from '../../lib/store';
 import { countryFlag, countryName, duaByCategory } from '../../lib/content';
 import type { Stats, Today } from '../../lib/types';
@@ -72,7 +72,7 @@ export default function TodayScreen() {
         style={styles.halo}
       />
       <ScrollView
-        contentContainerStyle={{ paddingTop: insets.top + space.md, paddingBottom: insets.bottom + 130, paddingHorizontal: space.lg }}
+        contentContainerStyle={[{ paddingTop: insets.top + space.md, paddingBottom: insets.bottom + 130, paddingHorizontal: space.lg }, column]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl

@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { useEffect } from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
   CormorantGaramond_500Medium,
@@ -12,7 +12,7 @@ import {
 } from '@expo-google-fonts/cormorant-garamond';
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
 import { Amiri_400Regular, Amiri_700Bold } from '@expo-google-fonts/amiri';
-import { AppProvider, useApp } from '../lib/store';
+import { AppProvider, backendMissing, useApp } from '../lib/store';
 import { ErrorBoundary as AppErrorBoundary } from '../components/ErrorBoundary';
 import { colors } from '../theme';
 import { getPushToken } from '../lib/notifications';
@@ -51,6 +51,19 @@ function Root() {
   }, [prefs.onboarded, api]);
 
   if (!loaded) return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
+
+  if (backendMissing) {
+    // Only seen if a store build was made without EXPO_PUBLIC_SUPABASE_URL / _ANON_KEY.
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+        <Text style={{ color: colors.ivory, fontSize: 20, textAlign: 'center', marginBottom: 8 }}>Setup incomplete</Text>
+        <Text style={{ color: colors.textMuted, fontSize: 15, textAlign: 'center' }}>
+          This build has no database keys. Add EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY as EAS
+          environment variables and build again.
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <>

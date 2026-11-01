@@ -67,3 +67,22 @@ export function isValidName(text: string): boolean {
   const t = text.trim();
   return t === '' || (/^[\p{L}\p{M}' .\-]{1,80}$/u.test(t) && !hasContactInfo(t));
 }
+
+// Signs the writer may be thinking of harming themselves. These needs are still shared
+// (they deserve dua most), but the writer is shown helpline resources right away.
+const SELF_HARM = [
+  /(suicid|kill myself|end my life|want to die|don'?t want to live|no reason to live|self[- ]?harm|hurt myself)/i,
+  /(انتحار|انتحر|أنتحر|اقتل نفسي|أقتل نفسي|أنهي حياتي|انهي حياتي|أريد أن أموت|اريد ان اموت|لا أريد أن أعيش|لا اريد ان اعيش)/,
+  /(خودکشی|خود کشی|مرنا چاہتا|مرنا چاہتی|جینا نہیں چاہتا|جینا نہیں چاہتی)/, // Urdu
+  /(خودکشی|می‌خواهم بمیرم|میخواهم بمیرم|نمی‌خواهم زندگی کنم)/, // Persian
+  /(intihar|kendimi öldür|ölmek istiyorum|yaşamak istemiyorum)/i,
+  /(bunuh diri|ingin mati|mau mati|tidak ingin hidup|nak mati|membunuh diri)/i,
+  /(আত্মহত্যা|মরে যেতে চাই|বাঁচতে চাই না)/,
+  /(me suicider|me tuer|envie de mourir|veux mourir|plus envie de vivre)/i,
+  /(selbstmord|suizid|mich umbringen|sterben will|nicht mehr leben)/i,
+];
+
+export function suggestsSelfHarm(text: string): boolean {
+  const t = text.normalize('NFKC');
+  return SELF_HARM.some((r) => r.test(t));
+}

@@ -18,12 +18,17 @@ export interface Prefs {
   notifSpecial: boolean;
 }
 
-function createApi(): Api {
+function createApi(): Api | null {
   const extra = (Constants.expoConfig?.extra ?? {}) as { supabaseUrl?: string; supabaseAnonKey?: string };
   const url = process.env.EXPO_PUBLIC_SUPABASE_URL || extra.supabaseUrl;
   const key = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || extra.supabaseAnonKey;
-  return url && key ? new SupabaseApi(url, key) : new DemoApi();
+  if (url && key) return new SupabaseApi(url, key);
+  // Store builds must never fall back to sample data.
+  if (REQUIRE_BACKEND) return null;
+  return new DemoApi();
 }
+
+const REQUIRE_BACKEND = process.env.EXPO_PUBLIC_REQUIRE_BACKEND === '1';
 
 // Use the phone's language when we support it, otherwise English.
 const deviceLocale = (): Locale => {
@@ -61,7 +66,10 @@ I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
 
 const AppContext = createContext<Ctx | null>(null);
-const api = createApi();
+const createdApi = createApi();
+/** True when a store build is missing its database keys (see PUBLISHING.md). */
+export const backendMissing = createdApi === null;
+const api: Api = createdApi ?? new DemoApi();
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);

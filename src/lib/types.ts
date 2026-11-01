@@ -78,7 +78,7 @@ export interface NewNeedInput {
 }
 
 export type SubmitResult =
-  | { ok: true; need: Need }
+  | { ok: true; need: Need; selfHarm?: boolean }
   | { ok: false; reason: 'contact' | 'money' | 'link' | 'abuse' | 'too_short' | 'too_long' | 'rate' | 'network' };
 
 export type ReportReason = 'spam' | 'money' | 'inappropriate' | 'personal_info' | 'other';

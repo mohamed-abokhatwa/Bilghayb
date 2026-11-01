@@ -124,6 +124,14 @@ create table public.reports (
   primary key (need_id, user_id)
 );
 
+-- People a user has blocked (by need; the blocker never learns who the author is).
+create table public.blocks (
+  user_id uuid not null references public.profiles on delete cascade,
+  blocked_author uuid not null references public.profiles on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (user_id, blocked_author)
+);
+
 -- ───────────────────────── Row level security ─────────────────────────
 -- Clients read through views/RPCs below. Direct table access is minimal.
 
@@ -135,6 +143,7 @@ alter table public.pilgrim_trips enable row level security;
 alter table public.pilgrim_carries enable row level security;
 alter table public.pilgrim_queue enable row level security;
 alter table public.reports enable row level security;
+alter table public.blocks enable row level security;
 
 create policy "own profile" on public.profiles
   for all using (id = auth.uid()) with check (id = auth.uid());
@@ -142,12 +151,17 @@ create policy "own profile" on public.profiles
 -- Needs are readable when visible. author_id is never selected by the app
 -- (and is hidden by the public view), so identity cannot leak.
 create policy "read visible needs" on public.needs
-  for select using (hidden = false or author_id = auth.uid());
+  for select using (
+    (hidden = false or author_id = auth.uid())
+    and not exists (select 1 from public.blocks b where b.user_id = auth.uid() and b.blocked_author = needs.author_id)
+  );
 -- Inserts only through the submit-need edge function (service role).
 -- Authors may delete their own needs.
 create policy "delete own needs" on public.needs
   for delete using (author_id = auth.uid());
 
+create policy "own blocks" on public.blocks
+  for select using (user_id = auth.uid());
 create policy "own assignments" on public.assignments
   for select using (user_id = auth.uid());
 create policy "own trips" on public.pilgrim_trips
@@ -196,6 +210,7 @@ begin
         and n.author_id <> uid
         and n.created_at > now() - interval '60 days'
         and not exists (select 1 from prayers p where p.need_id = n.id and p.user_id = uid)
+        and not exists (select 1 from blocks b where b.user_id = uid and b.blocked_author = n.author_id)
       order by same_lang desc, n.prayed_count asc, n.created_at desc
       limit 25
     ) c order by c.same_lang desc, random() limit 1;
@@ -283,6 +298,7 @@ language sql stable security definer set search_path = public as $$
          n.author_id = auth.uid()
   from needs n
   where n.kind = 'janazah' and n.hidden = false and n.created_at > now() - interval '40 days'
+    and not exists (select 1 from blocks b where b.user_id = auth.uid() and b.blocked_author = n.author_id)
   order by n.created_at desc
   limit 100;
 $$;
@@ -349,6 +365,38 @@ begin
   delete from assignments where user_id = auth.uid() and need_id = p_need and day = user_today(auth.uid());
 end $$;
 
+create or replace function public.block_author(p_need uuid)
+returns void language plpgsql security definer set search_path = public as $$
+declare
+  a uuid;
+begin
+  select author_id into a from needs where id = p_need;
+  if a is null or a = auth.uid() then return; end if;
+  insert into blocks (user_id, blocked_author) values (auth.uid(), a) on conflict do nothing;
+  -- Clear today's person if it is anything this author wrote.
+  delete from assignments
+  where user_id = auth.uid() and day = user_today(auth.uid())
+    and need_id in (select id from needs where author_id = a);
+end $$;
+
+-- ───────────────────────── Moderation (for the app owner) ─────────────────────────
+-- Open in the Supabase SQL editor: reported needs, newest first. Act within 24 hours.
+create or replace view public.moderation_queue as
+  select n.id, n.kind, n.body, n.answered_note, n.first_name, n.deceased_name, n.country, n.lang,
+         n.report_count, n.hidden, n.created_at,
+         (select string_agg(distinct r.reason, ', ') from reports r where r.need_id = n.id) as reasons,
+         (select max(r.created_at) from reports r where r.need_id = n.id) as last_report
+  from needs n
+  where n.report_count > 0
+  order by last_report desc;
+revoke all on public.moderation_queue from public, anon, authenticated;
+
+-- Moderator actions (run in the SQL editor):
+--   remove:  update needs set hidden = true  where id = '<need id>';
+--   restore: update needs set hidden = false, report_count = 0 where id = '<need id>';
+--   ban an author and everything they wrote:
+--            delete from auth.users where id = (select author_id from needs where id = '<need id>');
+
 create or replace function public.delete_my_account()
 returns void language plpgsql security definer set search_path = public as $$
 begin
@@ -357,10 +405,10 @@ end $$;
 
 -- Lock RPCs to signed-in users.
 revoke all on function public.get_daily_person, public.mark_prayed, public.my_stats, public.my_streak, public.mark_answered,
-  public.janazah_list, public.start_trip, public.mark_trip_read, public.end_trip, public.report_need,
+  public.janazah_list, public.start_trip, public.mark_trip_read, public.end_trip, public.report_need, public.block_author,
   public.delete_my_account from public, anon;
 grant execute on function public.get_daily_person, public.mark_prayed, public.my_stats, public.my_streak, public.mark_answered,
-  public.janazah_list, public.start_trip, public.mark_trip_read, public.end_trip, public.report_need,
+  public.janazah_list, public.start_trip, public.mark_trip_read, public.end_trip, public.report_need, public.block_author,
   public.delete_my_account to authenticated;
 grant select on public.needs_public to authenticated;
 

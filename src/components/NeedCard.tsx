@@ -1,5 +1,6 @@
 import { memo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Card, Row, Txt, quoted } from './ui';
 import { colors, radius, space } from '../theme';
 import { useApp } from '../lib/store';
@@ -34,10 +35,13 @@ export const NeedCard = memo(function NeedCard({
   need,
   footer,
   showAnswer,
+  onReport,
 }: {
   need: Need;
   footer?: React.ReactNode;
   showAnswer?: boolean;
+  /** Shows a ⋯ menu to report or block (for other people's needs). */
+  onReport?: (needId: string) => void;
 }) {
   const { t, cat, locale } = useApp();
   return (
@@ -56,11 +60,18 @@ export const NeedCard = memo(function NeedCard({
             </Txt>
           </View>
         </Row>
-        <View style={styles.tag}>
-          <Txt v="label" style={{ fontSize: 10, letterSpacing: 1.2 }}>
-            {cat(need.category)}
-          </Txt>
-        </View>
+        <Row gap={8}>
+          <View style={styles.tag}>
+            <Txt v="label" style={{ fontSize: 10, letterSpacing: 1.2 }}>
+              {cat(need.category)}
+            </Txt>
+          </View>
+          {onReport && !need.isMine && (
+            <Pressable hitSlop={12} onPress={() => onReport(need.id)} accessibilityRole="button" accessibilityLabel={t('report')}>
+              <Ionicons name="ellipsis-horizontal" size={16} color={colors.textFaint} />
+            </Pressable>
+          )}
+        </Row>
       </Row>
       <Txt auto style={{ marginTop: space.md }}>{need.body}</Txt>
       {!need.isMine && <LangBar text={need.answeredNote ? `${need.body}\n\n${need.answeredNote}` : need.body} lang={need.lang} />}

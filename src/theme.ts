@@ -39,6 +39,11 @@ export const fonts = {
   arabicBold: 'Amiri_700Bold',
 } as const;
 
+/** Content never gets wider than this, so the layout reads well on iPad and large phones. */
+export const CONTENT_MAX = 620;
+/** Centers a column of at most CONTENT_MAX on wide screens; no effect on phones. */
+export const column = { width: '100%', maxWidth: CONTENT_MAX, alignSelf: 'center' } as const;
+
 export const space = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, xxl: 48 } as const;
 export const radius = { sm: 10, md: 16, lg: 24, xl: 32, pill: 999 } as const;
 

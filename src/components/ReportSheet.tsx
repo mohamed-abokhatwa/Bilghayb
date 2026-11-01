@@ -16,13 +16,13 @@ const REASONS: { r: ReportReason; k: 'reportSpam' | 'reportMoney' | 'reportInapp
 
 export function ReportSheet({ needId, onClose }: { needId: string | null; onClose: () => void }) {
   const { t, api, touch } = useApp();
-  const [sent, setSent] = useState(false);
+  const [sent, setSent] = useState<false | 'reported' | 'blocked'>(false);
 
   const send = async (r: ReportReason) => {
     if (!needId) return;
     haptic.medium();
     await api.report(needId, r).catch(() => {});
-    setSent(true);
+    setSent('reported');
     setTimeout(() => {
       setSent(false);
       onClose();
@@ -30,11 +30,23 @@ export function ReportSheet({ needId, onClose }: { needId: string | null; onClos
     }, 1200);
   };
 
+  const block = async () => {
+    if (!needId) return;
+    haptic.medium();
+    await api.block(needId).catch(() => {});
+    setSent('blocked');
+    setTimeout(() => {
+      setSent(false);
+      onClose();
+      touch();
+    }, 1400);
+  };
+
   return (
     <Sheet visible={!!needId} onClose={onClose} title={t('reportTitle')}>
       {sent ? (
         <Txt center style={{ paddingVertical: space.xl }}>
-          {t('reported')}
+          {sent === 'blocked' ? t('blockedDone') : t('reported')}
         </Txt>
       ) : (
         <View>
@@ -43,6 +55,9 @@ export function ReportSheet({ needId, onClose }: { needId: string | null; onClos
               <Txt>{t(k)}</Txt>
             </Pressable>
           ))}
+          <Pressable onPress={block} style={[styles.row, { borderBottomWidth: 0 }]} accessibilityRole="button">
+            <Txt style={{ color: colors.danger }}>{t('blockPerson')}</Txt>
+          </Pressable>
         </View>
       )}
     </Sheet>

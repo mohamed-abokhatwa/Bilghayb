@@ -8,10 +8,11 @@
     "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.bilghayb",
+      "bundleIdentifier": "com.abokhatwa.bilghayb",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "requireFullScreen": true
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +22,14 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "app.bilghayb"
+      "package": "com.abokhatwa.bilghayb",
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -65,6 +73,8 @@
       "eas": {
         "projectId": ""
       }
-    }
+    },
+    "description": "Pray for a stranger. A stranger prays for you. Free, anonymous dua exchange.",
+    "githubUrl": "https://github.com/mohamed-abokhatwa/Bilghayb"
   }
 }

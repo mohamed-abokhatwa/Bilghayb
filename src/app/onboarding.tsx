@@ -5,13 +5,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { getLocales } from 'expo-localization';
 import { Chip, GoldButton, Ornament, Row, Txt } from '../components/ui';
-import { colors, fonts, gradients, radius, space } from '../theme';
+import { colors, column, fonts, gradients, radius, space } from '../theme';
 import { useApp } from '../lib/store';
 import { COUNTRIES, countryName } from '../lib/content';
 import { Ionicons } from '@expo/vector-icons';
 import { HowSteps, LanguageGrid, RulesList } from '../components/Guide';
 import { scheduleReminders } from '../lib/notifications';
 import { isValidName } from '../lib/moderation';
+import { ExternalLink } from '../components/ExternalLink';
+import { LINKS } from '../lib/links';
 
 const STEPS = 5; // language · hadith · how it works · rules · profile
 
@@ -50,7 +52,7 @@ export default function Onboarding() {
         colors={['rgba(214,186,124,0.16)', 'rgba(214,186,124,0)']}
         style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 420 }}
       />
-      <View style={[styles.top, { paddingTop: insets.top + space.md }]}>
+      <View style={[styles.top, column, { paddingTop: insets.top + space.md }]}>
         <Pressable
           onPress={() => step > 0 && setStep(step - 1)}
           disabled={step === 0}
@@ -78,7 +80,7 @@ export default function Onboarding() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={{ flexGrow: 1, padding: space.lg }} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={[{ flexGrow: 1, padding: space.lg }, column]} keyboardShouldPersistTaps="handled">
         <Animated.View style={{ flex: 1, justifyContent: 'center', opacity: fade, transform: [{ translateY }] }}>
           {step === 0 && (
             <View style={{ alignItems: 'center' }}>
@@ -199,7 +201,22 @@ export default function Onboarding() {
         </Animated.View>
       </ScrollView>
 
-      <View style={{ padding: space.lg, paddingBottom: insets.bottom + space.lg }}>
+      <View style={[{ padding: space.lg, paddingBottom: insets.bottom + space.lg }, column]}>
+        {step === STEPS - 1 && (
+          <View style={{ marginBottom: space.md }}>
+            <Txt v="small" center style={{ fontSize: 12, lineHeight: 18 }}>
+              {t('agreeTerms')}
+            </Txt>
+            <Row gap={space.md} style={{ justifyContent: 'center', marginTop: 6 }}>
+              <ExternalLink href={LINKS.terms} label={t('terms')}>
+                <Txt v="small" style={{ fontSize: 12, color: colors.gold, textDecorationLine: 'underline' }}>{t('terms')}</Txt>
+              </ExternalLink>
+              <ExternalLink href={LINKS.privacy} label={t('privacyPolicy')}>
+                <Txt v="small" style={{ fontSize: 12, color: colors.gold, textDecorationLine: 'underline' }}>{t('privacyPolicy')}</Txt>
+              </ExternalLink>
+            </Row>
+          </View>
+        )}
         <GoldButton
           label={step === STEPS - 1 ? t('begin') : t('continue')}
           onPress={next}

@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Api, Profile } from './api';
 import { localDay } from './api';
 import type { Need, NewNeedInput, PilgrimTrip, Stats, SubmitResult, Today } from '../lib/types';
-import { checkNeedText, checkShortText, isValidName } from '../lib/moderation';
+import { checkNeedText, checkShortText, isValidName, suggestsSelfHarm } from '../lib/moderation';
 import { SEED_NEEDS } from './seed';
 import { detectLang } from '../lib/language';
 
@@ -189,7 +189,7 @@ export class DemoApi implements Api {
     this.state.needs.unshift(need);
     if (input.sendWithPilgrims && this.state.trip) this.state.trip.carrying.unshift(need);
     this.save();
-    return { ok: true, need };
+    return { ok: true, need, selfHarm: suggestsSelfHarm(input.body) };
   }
 
   async myNeeds() {
@@ -278,6 +278,11 @@ export class DemoApi implements Api {
     const day = localDay();
     if (this.state.assignments[day]?.needId === needId) delete this.state.assignments[day];
     this.save();
+  }
+
+  async block(needId: string) {
+    // Demo: every need has a different author, so blocking hides this need.
+    await this.report(needId);
   }
 
   async deleteAccount() {
