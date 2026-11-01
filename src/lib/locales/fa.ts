@@ -151,4 +151,7 @@ export const fa: Partial<Record<StringKey, string>> = {
   howItWorks: 'بالغیب چگونه کار می‌کند',
   notifNightBody: 'پروردگار ما در ثلث آخر شب فرود می‌آید: کیست که مرا بخواند؟',
   notifFridayBody: 'ساعت پایانی جمعه، که هیچ دعایی رد نمی‌شود.',
+  writtenIn: "نوشته‌شده به {lang}",
+  translate: "ترجمه",
+  foreignNote: "لازم نیست همه‌ی کلمات را بفهمید. خدا حاجتش را می‌داند. می‌توانید بگویید:",
 };

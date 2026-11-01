@@ -151,4 +151,7 @@ export const ur: Partial<Record<StringKey, string>> = {
   howItWorks: 'بالغیب کیسے کام کرتا ہے',
   notifNightBody: 'ہمارا رب رات کے آخری تہائی میں نازل ہوتا ہے: کون ہے جو مجھ سے دعا کرے؟',
   notifFridayBody: 'جمعہ کی آخری گھڑی، جب کوئی دعا رد نہیں ہوتی۔',
+  writtenIn: "{lang} میں لکھا گیا",
+  translate: "ترجمہ",
+  foreignNote: "ہر لفظ سمجھنا ضروری نہیں۔ اللہ اس کی حاجت جانتا ہے۔ آپ کہہ سکتے ہیں:",
 };

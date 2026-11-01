@@ -151,4 +151,7 @@ export const bn: Partial<Record<StringKey, string>> = {
   howItWorks: 'বিল-গায়েব কীভাবে কাজ করে',
   notifNightBody: 'আমাদের রব রাতের শেষ তৃতীয়াংশে নেমে আসেন: কে আছে যে আমাকে ডাকবে?',
   notifFridayBody: 'জুমার শেষ সময়, যখন কোনো দোয়া ফিরিয়ে দেওয়া হয় না।',
+  writtenIn: "{lang} ভাষায় লেখা",
+  translate: "অনুবাদ",
+  foreignNote: "প্রতিটি শব্দ বোঝার দরকার নেই। আল্লাহ তার প্রয়োজন জানেন। আপনি বলতে পারেন:",
 };

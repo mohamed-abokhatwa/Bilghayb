@@ -150,4 +150,7 @@ export const de: Partial<Record<StringKey, string>> = {
   howItWorks: 'So funktioniert Bil-Ghayb',
   notifNightBody: 'Unser Herr steigt im letzten Drittel der Nacht herab: Wer ruft Mich an?',
   notifFridayBody: 'Die letzte Stunde des Freitags, in der kein Gebet abgewiesen wird.',
+  writtenIn: "Geschrieben auf {lang}",
+  translate: "Übersetzen",
+  foreignNote: "Du musst nicht jedes Wort verstehen. Allah kennt sein Anliegen. Du kannst sagen:",
 };

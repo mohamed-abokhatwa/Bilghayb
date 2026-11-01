@@ -197,6 +197,9 @@ const en = {
   howItWorks: 'How Bil-Ghayb works',
   notifNightBody: 'Our Lord descends in the last third of the night: who is calling upon Me?',
   notifFridayBody: 'The last hour of Friday, when no dua is turned away.',
+  writtenIn: "Written in {lang}",
+  translate: "Translate",
+  foreignNote: "You don't need to understand every word. Allah knows their need. You can say:",
 };
 
 export type StringKey = keyof typeof en;
@@ -354,6 +357,9 @@ const ar: Record<StringKey, string> = {
   howItWorks: 'كيف يعمل بالغيب',
   notifNightBody: 'ينزل ربنا في الثلث الأخير من الليل فيقول: من يدعوني فأستجيب له؟',
   notifFridayBody: 'آخر ساعة من يوم الجمعة، لا يُرد فيها الدعاء.',
+  writtenIn: "مكتوبة بـ{lang}",
+  translate: "ترجمة",
+  foreignNote: "لا يلزمك فهم كل كلمة، فالله يعلم حاجته. يمكنك أن تقول:",
 };
 
 

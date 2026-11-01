@@ -51,7 +51,8 @@
         {
           "color": "#D6BA7C"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "scheme": "bilghayb",
     "backgroundColor": "#08130F",

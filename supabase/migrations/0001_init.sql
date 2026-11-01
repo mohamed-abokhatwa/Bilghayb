@@ -49,6 +49,7 @@ create table public.needs (
   country char(2) not null,
   category text not null check (category in ('health','rizq','marriage','children','exams','grief','guidance','debt','family','other')),
   body text not null check (char_length(body) between 12 and 280),
+  lang text not null default 'en' check (lang in ('en','ar','ur','fa','tr','id','ms','bn','fr','de')),
   deceased_name text check (char_length(deceased_name) <= 80),
   status text not null default 'open' check (status in ('open','answered')),
   answered_note text check (char_length(answered_note) <= 280),
@@ -157,7 +158,7 @@ create policy "own carries" on public.pilgrim_carries
 
 -- Public projection without author_id.
 create view public.needs_public with (security_invoker = true) as
-  select id, kind, first_name, gender, country, category, body, deceased_name, status,
+  select id, kind, first_name, gender, country, category, body, lang, deceased_name, status,
          answered_note, answered_at, prayed_count, created_at,
          (author_id = auth.uid()) as is_mine
   from public.needs;
@@ -187,15 +188,17 @@ begin
   if not found then
     -- Least-prayed open needs first, skipping own needs and ones already prayed for.
     -- A small random window avoids everyone getting the same person.
-    select n.id into picked from (
-      select n.id from needs n
+    -- The reader's language always wins; the random pick happens only inside that group.
+    select c.id into picked from (
+      select n.id, (n.lang = (select locale from profiles where id = uid)) as same_lang
+      from needs n
       where n.kind = 'need' and n.status = 'open' and n.hidden = false
         and n.author_id <> uid
         and n.created_at > now() - interval '60 days'
         and not exists (select 1 from prayers p where p.need_id = n.id and p.user_id = uid)
-      order by n.prayed_count asc, n.created_at desc
+      order by same_lang desc, n.prayed_count asc, n.created_at desc
       limit 25
-    ) n order by random() limit 1;
+    ) c order by c.same_lang desc, random() limit 1;
 
     insert into assignments (user_id, day, need_id) values (uid, d, picked)
     on conflict do nothing;
@@ -271,10 +274,10 @@ begin
 end $$;
 
 create or replace function public.janazah_list()
-returns table (id uuid, first_name text, gender char, country char, category text, body text,
+returns table (id uuid, first_name text, gender char, country char, category text, body text, lang text,
                deceased_name text, prayed_count int, created_at timestamptz, prayed_by_me boolean, is_mine boolean)
 language sql stable security definer set search_path = public as $$
-  select n.id, n.first_name, n.gender, n.country, n.category, n.body, n.deceased_name, n.prayed_count,
+  select n.id, n.first_name, n.gender, n.country, n.category, n.body, n.lang, n.deceased_name, n.prayed_count,
          n.created_at,
          exists (select 1 from prayers p where p.need_id = n.id and p.user_id = auth.uid()),
          n.author_id = auth.uid()

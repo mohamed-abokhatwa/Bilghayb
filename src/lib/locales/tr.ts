@@ -150,4 +150,7 @@ export const tr: Partial<Record<StringKey, string>> = {
   howItWorks: 'Bil-Ghayb nasıl çalışır',
   notifNightBody: 'Rabbimiz gecenin son üçte birinde iner: Bana dua eden yok mu?',
   notifFridayBody: 'Cumanın son saati, hiçbir duanın geri çevrilmediği vakit.',
+  writtenIn: "Dil: {lang}",
+  translate: "Çevir",
+  foreignNote: "Her kelimeyi anlaman gerekmez. Allah onun ihtiyacını bilir. Şöyle diyebilirsin:",
 };

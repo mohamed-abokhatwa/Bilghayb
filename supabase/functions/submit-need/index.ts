@@ -18,6 +18,7 @@ const cors = {
 
 // Same rules as the app (copied from src/lib/moderation.ts). Never trust the client.
 import { checkNeedText, isValidName } from '../_shared/moderation.ts';
+import { detectLang } from '../_shared/language.ts';
 
 function ruleCheck(text: string): string | null {
   return checkNeedText(text);
@@ -104,7 +105,7 @@ Deno.serve(async (req) => {
   const verdict = await aiCheck(`${deceased ? `Deceased: ${deceased}\n` : ''}${text}`);
   if (verdict === 'BLOCK') return json({ ok: false, reason: 'abuse' });
 
-  const { data: profile } = await admin.from('profiles').select('country, gender').eq('id', uid).single();
+  const { data: profile } = await admin.from('profiles').select('country, gender, locale').eq('id', uid).single();
 
   const { data: need, error } = await admin
     .from('needs')
@@ -116,9 +117,10 @@ Deno.serve(async (req) => {
       country: profile?.country ?? 'XX',
       category,
       body: text,
+      lang: detectLang(text, profile?.locale ?? 'en'),
       deceased_name: deceased,
     })
-    .select('id, kind, first_name, gender, country, category, body, deceased_name, status, prayed_count, created_at')
+    .select('id, kind, first_name, gender, country, category, body, lang, deceased_name, status, prayed_count, created_at')
     .single();
   if (error || !need) return json({ ok: false, reason: 'network' }, 500);
 

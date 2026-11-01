@@ -6,6 +6,7 @@ let i = 0;
 const n = (p: Partial<Need> & Pick<Need, 'country' | 'category' | 'body'>): Need => ({
   id: `seed-${++i}`,
   kind: 'need',
+  lang: 'en',
   firstName: null,
   gender: null,
   createdAt: ago(i * 5),
@@ -28,6 +29,13 @@ export const SEED_NEEDS: Need[] = [
   n({ firstName: 'Khalid', gender: 'm', country: 'SA', category: 'health', body: 'Diagnosed with depression. Some days are very heavy. Please pray for light in my heart.' }),
   n({ firstName: 'Aisha', gender: 'f', country: 'NG', category: 'exams', body: 'First in my family to go to university. Finals start Monday, please pray for me.' }),
   n({ gender: 'm', country: 'FR', category: 'guidance', body: 'Pray that Allah helps me stop a bad habit and return to Him sincerely.' }),
+  n({ lang: 'ar', firstName: 'نورة', gender: 'f', country: 'SA', category: 'health', body: 'أمي في العناية المركزة منذ أسبوع، ادعوا الله أن يشفيها ويخفف عنها.' }),
+  n({ lang: 'ar', gender: 'm', country: 'EG', category: 'debt', body: 'عليّ ديون كثيرة بعد مرض والدي، ادعوا الله أن يقضي ديني ويرزقني من حيث لا أحتسب.' }),
+  n({ lang: 'tr', firstName: 'Elif', gender: 'f', country: 'TR', category: 'exams', body: 'Yarın üniversite sınavım var. Allah’ın kolaylık vermesi için dua eder misiniz?' }),
+  n({ lang: 'id', firstName: 'Rizky', gender: 'm', country: 'ID', category: 'rizq', body: 'Saya baru di-PHK dan punya dua anak kecil. Mohon doakan agar Allah memberi rezeki yang halal.' }),
+  n({ lang: 'ur', gender: 'f', country: 'PK', category: 'marriage', body: 'میری بیٹی کے لیے دعا کریں کہ اللہ اسے نیک رشتہ عطا فرمائے۔' }),
+  n({ lang: 'bn', firstName: 'Rahim', gender: 'm', country: 'BD', category: 'health', body: 'আমার বাবার ক্যান্সার ধরা পড়েছে। আল্লাহ যেন তাকে সুস্থ করে দেন, দোয়া করবেন।' }),
+  n({ lang: 'fr', gender: 'f', country: 'FR', category: 'guidance', body: 'Priez pour que mon frère revienne à la prière et trouve la paix du cœur.' }),
   n({
     kind: 'janazah',
     firstName: 'Hassan',

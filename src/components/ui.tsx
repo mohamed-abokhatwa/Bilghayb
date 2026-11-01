@@ -68,6 +68,11 @@ const complexScriptOverride: Partial<Record<Variant, TextStyle>> = {
 const ARABIC_SCRIPT = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
 const STRONG_CHAR = /[A-Za-z\u00C0-\u024F\u0980-\u09FF\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
 
+/** Wrap user text in quote marks that suit its script: «…» for Arabic script, “…” otherwise. */
+export function quoted(text: string) {
+  return textDirection(text) === 'rtl' ? `«${text}»` : `“${text}”`;
+}
+
 /** Direction of a piece of user-written text, from its first letter. */
 export function textDirection(text: string): 'rtl' | 'ltr' {
   const m = text.match(STRONG_CHAR);

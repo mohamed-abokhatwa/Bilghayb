@@ -150,4 +150,7 @@ export const ms: Partial<Record<StringKey, string>> = {
   howItWorks: 'Cara Bil-Ghayb berfungsi',
   notifNightBody: 'Tuhan kita turun pada sepertiga malam terakhir: siapakah yang berdoa kepada-Ku?',
   notifFridayBody: 'Saat terakhir hari Jumaat, ketika tiada doa yang ditolak.',
+  writtenIn: "Ditulis dalam {lang}",
+  translate: "Terjemah",
+  foreignNote: "Anda tidak perlu memahami setiap perkataan. Allah mengetahui hajatnya. Anda boleh berdoa:",
 };

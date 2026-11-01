@@ -4,6 +4,7 @@ import { localDay } from './api';
 import type { Need, NewNeedInput, PilgrimTrip, Stats, SubmitResult, Today } from '../lib/types';
 import { checkNeedText, checkShortText, isValidName } from '../lib/moderation';
 import { SEED_NEEDS } from './seed';
+import { detectLang } from '../lib/language';
 
 // Fully working offline backend so the app is usable before Supabase is set up.
 // Data stays on the device.
@@ -96,7 +97,13 @@ export class DemoApi implements Api {
       const pool = this.state.needs
         .filter((n) => n.kind === 'need' && n.status === 'open' && !n.isMine && this.visible(n))
         .filter((n) => !this.state.prayedIds.includes(n.id))
-        .sort((x, y) => x.prayedCount - y.prayedCount || (hash(day + x.id) % 7) - (hash(day + y.id) % 7));
+        .sort((x, y) => {
+          // Needs in the reader's language first, then the least-prayed.
+          const mine = this.state.profile?.locale ?? 'en';
+          const lx = Number((x.lang ?? 'en') === mine);
+          const ly = Number((y.lang ?? 'en') === mine);
+          return ly - lx || x.prayedCount - y.prayedCount || (hash(day + x.id) % 7) - (hash(day + y.id) % 7);
+        });
       a = { needId: pool[0]?.id ?? null, prayed: false };
       this.state.assignments[day] = a;
       this.save();
@@ -172,6 +179,7 @@ export class DemoApi implements Api {
       country: input.country,
       category: input.category,
       body: input.body.trim(),
+      lang: detectLang(input.body, this.state.profile?.locale ?? 'en'),
       deceasedName: input.deceasedName ?? null,
       createdAt: new Date().toISOString(),
       prayedCount: 0,

@@ -4,9 +4,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { Animated, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Card, Loader, Ornament, PressableScale, Row, Txt } from '../../components/ui';
+import { Card, Loader, Ornament, PressableScale, Row, Txt, quoted } from '../../components/ui';
 import { PrayButton } from '../../components/PrayButton';
 import { ReportSheet } from '../../components/ReportSheet';
+import { LangBar } from '../../components/LangBar';
 import { personName } from '../../components/NeedCard';
 import { colors, gradients, radius, space } from '../../theme';
 import { useApp, useLoad } from '../../lib/store';
@@ -154,8 +155,9 @@ export default function TodayScreen() {
               <Ornament />
 
               <Txt v="quote" center auto>
-                {`“${need.body}”`}
+                {quoted(need.body)}
               </Txt>
+              <LangBar text={need.body} lang={need.lang} showNote />
 
               <View style={{ marginTop: space.xl }}>
                 <PrayButton done={prayed} onComplete={onPrayed} />

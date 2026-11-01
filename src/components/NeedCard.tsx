@@ -1,10 +1,11 @@
 import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Card, Row, Txt } from './ui';
+import { Card, Row, Txt, quoted } from './ui';
 import { colors, radius, space } from '../theme';
 import { useApp } from '../lib/store';
 import { countryFlag, countryName } from '../lib/content';
 import type { Need } from '../lib/types';
+import { LangBar } from './LangBar';
 
 export function personName(n: Pick<Need, 'firstName' | 'gender'>, t: ReturnType<typeof useApp>['t']) {
   if (n.firstName) return n.firstName;
@@ -62,13 +63,14 @@ export const NeedCard = memo(function NeedCard({
         </View>
       </Row>
       <Txt auto style={{ marginTop: space.md }}>{need.body}</Txt>
+      {!need.isMine && <LangBar text={need.answeredNote ? `${need.body}\n\n${need.answeredNote}` : need.body} lang={need.lang} />}
       {showAnswer && need.answeredNote ? (
         <View style={styles.answer}>
           <Txt v="label" style={{ marginBottom: 6 }}>
             {t('alhamdulillah')}
           </Txt>
           <Txt v="quote" auto style={{ fontSize: 19, lineHeight: 28 }}>
-            {`“${need.answeredNote}”`}
+            {quoted(need.answeredNote)}
           </Txt>
         </View>
       ) : null}

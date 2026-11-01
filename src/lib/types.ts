@@ -33,6 +33,8 @@ export interface Need {
   country: string; // ISO-3166 alpha-2
   category: Category;
   body: string;
+  /** Language the need is written in (app language code). */
+  lang: string;
   deceasedName?: string | null;
   createdAt: string;
   prayedCount: number;

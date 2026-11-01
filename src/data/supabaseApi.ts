@@ -13,6 +13,7 @@ interface NeedRow {
   country: string;
   category: Need['category'];
   body: string;
+  lang?: string;
   deceased_name: string | null;
   status?: 'open' | 'answered';
   answered_note?: string | null;
@@ -23,7 +24,7 @@ interface NeedRow {
 }
 
 const NEED_COLS =
-  'id, kind, first_name, gender, country, category, body, deceased_name, status, answered_note, answered_at, prayed_count, created_at, is_mine';
+  'id, kind, first_name, gender, country, category, body, lang, deceased_name, status, answered_note, answered_at, prayed_count, created_at, is_mine';
 
 const toNeed = (r: NeedRow): Need => ({
   id: r.id,
@@ -33,6 +34,7 @@ const toNeed = (r: NeedRow): Need => ({
   country: r.country,
   category: r.category,
   body: r.body,
+  lang: r.lang ?? 'en',
   deceasedName: r.deceased_name,
   status: r.status ?? 'open',
   answeredNote: r.answered_note ?? null,
@@ -122,7 +124,7 @@ export class SupabaseApi implements Api {
     const id = await this.uid();
     const { data } = await this.sb
       .from('needs')
-      .select('id, kind, first_name, gender, country, category, body, deceased_name, status, answered_note, answered_at, prayed_count, created_at')
+      .select('id, kind, first_name, gender, country, category, body, lang, deceased_name, status, answered_note, answered_at, prayed_count, created_at')
       .eq('author_id', id)
       .order('created_at', { ascending: false })
       .limit(100);
