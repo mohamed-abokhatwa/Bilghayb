@@ -10,7 +10,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.abokhatwa.bilghayb",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "ExpoLocalization_supportsRTL": false
       },
       "requireFullScreen": true
     },
@@ -71,10 +72,18 @@
       "supabaseUrl": "",
       "supabaseAnonKey": "",
       "eas": {
-        "projectId": ""
-      }
+        "projectId": "dcc40d7e-2f09-4630-b28c-e5d5ce91c0a2"
+      },
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "supportsRTL": false,
+      "forcesRTL": false
     },
     "description": "Pray for a stranger. A stranger prays for you. Free, anonymous dua exchange.",
-    "githubUrl": "https://github.com/mohamed-abokhatwa/Bilghayb"
+    "githubUrl": "https://github.com/mohamed-abokhatwa/Bilghayb",
+    "owner": "abokhatwa"
   }
 }
