@@ -1,0 +1,10 @@
+# Supabase project settings used by `npx supabase functions deploy`.
+project_id = "bilghayb"
+
+[functions.submit-need]
+# Only signed-in (anonymous) app users may post needs.
+verify_jwt = true
+
+[functions.daily-push]
+# Called by the hourly database timer, which proves itself with the CRON_SECRET header instead.
+verify_jwt = false
