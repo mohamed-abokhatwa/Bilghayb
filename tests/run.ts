@@ -53,6 +53,10 @@ const allowed = [
 ];
 for (const t of allowed) expect(`allows: ${t}`, checkNeedText(t) === null);
 
+// Arabic words that contain swear-word letters must not be blocked.
+expect('allows عكس / انعكاس / زبون', checkNeedText('ادعوا لي، كل شيء يسير عكس ما أريد وزبوني الوحيد غادر') === null);
+expect('still blocks whole-word abuse', checkNeedText('هذا كلام سيء يا شرموط لا يقال') === 'abuse');
+
 // Length limits.
 expect('too short', checkNeedText('pray') === 'too_short');
 expect('too long', checkNeedText('a'.repeat(281)) === 'too_long');

@@ -33,7 +33,8 @@ const CONTACT: RegExp[] = [
 
 const MONEY =
   /(paypal|western union|bank account|iban|venmo|cashapp|gofundme|donate|bitcoin|crypto|transfer money|send money|stc ?pay|easypaisa|jazzcash|bkash|bikash|nagad|gopay|papara|iban'?ım|kirim uang|transfer uang|virement|überweisung|spende|پیسے بھیجیں|پول بفرستید|টাকা পাঠান|تحويل|حساب بنكي|آيبان|ايبان|تبرع|ارسل(وا)? (لي )?(مال|فلوس))/i;
-const ABUSE = /(kill|fuck|shit|bitch|كس|زب|شرموط)/i;
+// Arabic words are matched as whole words only: "كس" is inside "عكس" (reverse), "زب" inside "زبون" (customer).
+const ABUSE = /(\bkill\b|fuck|shit|bitch|(?<!\p{L})(كس|زب|شرموط)(?!\p{L}))/iu;
 
 export function hasContactInfo(text: string): boolean {
   const t = text.normalize('NFKC');
