@@ -13,21 +13,26 @@ const CONTACT: RegExp[] = [
   /[^\s@]+@[^\s@]+\.[^\s@]+/, // email
   /[^\s]+\s*(\(at\)|\[at\]| at )\s*[^\s]+\s*(\.|dot)\s*[a-z]{2,}/i, // "name at gmail dot com"
   /(^|\s)@[\p{L}0-9_.]{2,}/u, // @handle
-  /([0-9٠-٩۰-۹][\s\-.()/]*){6,}/, // 6+ digits (Latin, Arabic-Indic, Persian), spaces/dashes allowed
-  /\+\s*[0-9٠-٩]{2,}/, // international prefix
+  /([0-9٠-٩۰-۹০-৯०-९][\s\-.()/]*){6,}/, // 6+ digits (Latin, Arabic-Indic, Persian, Bengali, Hindi), spaces/dashes allowed
+  /\+\s*[0-9٠-٩۰-۹০-৯]{2,}/, // international prefix
   // messaging apps and social networks
   /(whats\s*app|wa\.me|watsap|telegram|t\.me|viber|snap\s*chat|snap\b|insta(gram)?\b|facebook|\bfb\b|messenger|tik\s*tok|twitter|\bx\.com|linkedin|discord|skype|wechat|line id)/i,
   /(واتس|واتساب|وتساب|تلغرام|تليجرام|تيليجرام|سناب|انستا|انستقرام|انستغرام|فيسبوك|فيس بوك|تويتر|تيك توك|ماسنجر)/,
   // asking to be contacted
   /(call me|text me|message me|dm me|contact me|reach me|my number|my phone|my email|my account|add me)/i,
   /(كلموني|كلمني|اتصلوا|اتصل بي|راسلوني|راسلني|تواصلوا|تواصل معي|رقمي|رقم جوالي|رقم هاتفي|ايميلي|بريدي|ضيفوني)/,
+  // the same, in the other app languages
+  /(میرا نمبر|میرے نمبر|رابطہ کریں|مجھ سے رابطہ|فون کریں|کال کریں|شماره من|شماره‌ام|با من تماس|تماس بگیرید|پیام بدهید)/, // Urdu, Persian
+  /(numaram|numaramı|beni ara|bana ulaş|bana yaz|iletişime geç|hubungi saya|nomor saya|nomorku|nombor saya|telefon saya|chat saya|japri|\bwa\b|appelez[- ]moi|mon numéro|contactez[- ]moi|écrivez[- ]moi|ruf mich an|meine nummer|schreib mir|kontaktiere mich|meine handynummer)/i,
+  /(আমার নম্বর|আমার নাম্বার|যোগাযোগ করুন|ফোন করুন|কল করুন|মেসেজ করুন)/, // Bengali
   // numbers written as words (e.g. "zero five five ..."), 5+ in a row
   /\b((zero|oh|one|two|three|four|five|six|seven|eight|nine)[\s,\-]+){4,}(zero|oh|one|two|three|four|five|six|seven|eight|nine)\b/i,
   /((صفر|واحد|اثنين|اثنان|ثلاثة|ثلاث|اربعة|أربعة|خمسة|ستة|سبعة|ثمانية|تسعة)[\s،,\-]+){4,}/,
+  /\b((sıfır|bir|iki|üç|dört|beş|altı|yedi|sekiz|dokuz|nol|kosong|satu|dua|tiga|empat|lima|enam|tujuh|delapan|lapan|sembilan|zéro|un|deux|trois|quatre|cinq|six|sept|huit|neuf|null|eins|zwei|drei|vier|fünf|sechs|sieben|acht|neun)[\s,\-]+){5,}/i,
 ];
 
 const MONEY =
-  /(paypal|western union|bank account|iban|venmo|cashapp|gofundme|donate|bitcoin|crypto|transfer money|send money|stc ?pay|تحويل|حساب بنكي|آيبان|ايبان|تبرع|ارسل(وا)? (لي )?(مال|فلوس))/i;
+  /(paypal|western union|bank account|iban|venmo|cashapp|gofundme|donate|bitcoin|crypto|transfer money|send money|stc ?pay|easypaisa|jazzcash|bkash|bikash|nagad|gopay|papara|iban'?ım|kirim uang|transfer uang|virement|überweisung|spende|پیسے بھیجیں|پول بفرستید|টাকা পাঠান|تحويل|حساب بنكي|آيبان|ايبان|تبرع|ارسل(وا)? (لي )?(مال|فلوس))/i;
 const ABUSE = /(kill|fuck|shit|bitch|كس|زب|شرموط)/i;
 
 export function hasContactInfo(text: string): boolean {

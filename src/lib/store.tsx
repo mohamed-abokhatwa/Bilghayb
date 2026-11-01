@@ -6,7 +6,7 @@ import Constants from 'expo-constants';
 import type { Api, Profile } from '../data/api';
 import { DemoApi } from '../data/demoApi';
 import { SupabaseApi } from '../data/supabaseApi';
-import { categoryLabels, format, strings, type Locale, type StringKey } from './i18n';
+import { RTL_LOCALES, categoryLabels, format, isLocale, strings, type Locale, type StringKey } from './i18n';
 import type { Category } from './types';
 
 const PREFS_KEY = 'bg.prefs.v1';
@@ -25,7 +25,11 @@ function createApi(): Api {
   return url && key ? new SupabaseApi(url, key) : new DemoApi();
 }
 
-const deviceLocale = (): Locale => (getLocales()[0]?.languageCode === 'ar' ? 'ar' : 'en');
+// Use the phone's language when we support it, otherwise English.
+const deviceLocale = (): Locale => {
+  for (const l of getLocales()) if (isLocale(l.languageCode)) return l.languageCode;
+  return 'en';
+};
 
 const defaults = (): Prefs => ({
   onboarded: false,
@@ -68,7 +72,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     (async () => {
       try {
         const raw = await AsyncStorage.getItem(PREFS_KEY);
-        if (raw) setPrefsState({ ...defaults(), ...JSON.parse(raw) });
+        if (raw) {
+          const saved = { ...defaults(), ...JSON.parse(raw) } as Prefs;
+          if (!isLocale(saved.profile.locale)) saved.profile.locale = 'en';
+          setPrefsState(saved);
+        }
       } catch {}
       setReady(true);
     })();
@@ -107,7 +115,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const locale = prefs.profile.locale;
-  const rtl = locale === 'ar';
+  const rtl = RTL_LOCALES.includes(locale);
 
   const value = useMemo<Ctx>(
     () => ({

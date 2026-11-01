@@ -1,6 +1,25 @@
 import type { Category } from './types';
+import { ur, fa, tr, id, ms, bn, fr, de, categoryExtra } from './locales';
 
-export type Locale = 'en' | 'ar';
+
+export type Locale = 'en' | 'ar' | 'ur' | 'fa' | 'tr' | 'id' | 'ms' | 'bn' | 'fr' | 'de';
+
+/** Languages shown in the picker, in their own script. */
+export const LANGUAGES: { code: Locale; native: string; english: string; rtl: boolean }[] = [
+  { code: 'ar', native: 'العربية', english: 'Arabic', rtl: true },
+  { code: 'en', native: 'English', english: 'English', rtl: false },
+  { code: 'ur', native: 'اردو', english: 'Urdu', rtl: true },
+  { code: 'id', native: 'Bahasa Indonesia', english: 'Indonesian', rtl: false },
+  { code: 'tr', native: 'Türkçe', english: 'Turkish', rtl: false },
+  { code: 'bn', native: 'বাংলা', english: 'Bengali', rtl: false },
+  { code: 'fr', native: 'Français', english: 'French', rtl: false },
+  { code: 'ms', native: 'Bahasa Melayu', english: 'Malay', rtl: false },
+  { code: 'fa', native: 'فارسی', english: 'Persian', rtl: true },
+  { code: 'de', native: 'Deutsch', english: 'German', rtl: false },
+];
+
+export const RTL_LOCALES: Locale[] = LANGUAGES.filter((l) => l.rtl).map((l) => l.code);
+export const isLocale = (x: unknown): x is Locale => LANGUAGES.some((l) => l.code === x);
 
 const en = {
   appName: 'Bil-Ghayb',
@@ -158,6 +177,26 @@ const en = {
 
   demoBanner: 'Demo mode: data stays on this device',
   back: 'Back',
+
+  // Language + guide
+  chooseLanguage: 'Choose your language',
+  langSub: 'You can change it any time from the Me tab.',
+  howTitle: 'How it works',
+  how1Title: 'Receive one person',
+  how1Body: 'Every morning after Fajr, you receive one stranger and what weighs on their heart.',
+  how2Title: 'Make dua, then hold',
+  how2Body: 'Pray for them sincerely, in your own words. Then press and hold the golden button.',
+  how3Title: 'Ask for yourself',
+  how3Body: 'Share your own need. Strangers around the world will pray for you without knowing who you are.',
+  how4Title: 'Give thanks',
+  how4Body: 'When Allah answers your dua, share it on the Answered wall so others find hope.',
+  rule1: 'No names exchanged, no chat',
+  rule2: 'No phone numbers or contact details',
+  rule3: 'No money: dua only',
+  rule4: 'Free forever, no ads',
+  howItWorks: 'How Bil-Ghayb works',
+  notifNightBody: 'Our Lord descends in the last third of the night: who is calling upon Me?',
+  notifFridayBody: 'The last hour of Friday, when no dua is turned away.',
 };
 
 export type StringKey = keyof typeof en;
@@ -297,11 +336,44 @@ const ar: Record<StringKey, string> = {
   reported: 'شكرًا لك، سنراجعها.',
   demoBanner: 'وضع تجريبي: البيانات على هذا الجهاز فقط',
   back: 'رجوع',
+  chooseLanguage: 'اختر لغتك',
+  langSub: 'يمكنك تغييرها في أي وقت من صفحة «أنا».',
+  howTitle: 'كيف يعمل التطبيق',
+  how1Title: 'يصلك شخص واحد',
+  how1Body: 'كل صباح بعد الفجر يصلك غريب وما يثقل قلبه.',
+  how2Title: 'ادعُ له ثم اضغط',
+  how2Body: 'ادعُ له بصدق وبكلماتك، ثم اضغط مطولًا على الزر الذهبي.',
+  how3Title: 'اطلب لنفسك',
+  how3Body: 'شارك حاجتك، وسيدعو لك غرباء حول العالم دون أن يعرفوا من أنت.',
+  how4Title: 'احمد الله',
+  how4Body: 'إذا استجاب الله دعاءك فشاركه في صفحة «استُجيب» ليجد غيرك الأمل.',
+  rule1: 'لا أسماء تُتبادل ولا محادثات',
+  rule2: 'لا أرقام هواتف ولا وسائل تواصل',
+  rule3: 'لا أموال، الدعاء فقط',
+  rule4: 'مجاني دائمًا وبلا إعلانات',
+  howItWorks: 'كيف يعمل بالغيب',
+  notifNightBody: 'ينزل ربنا في الثلث الأخير من الليل فيقول: من يدعوني فأستجيب له؟',
+  notifFridayBody: 'آخر ساعة من يوم الجمعة، لا يُرد فيها الدعاء.',
 };
 
-export const strings: Record<Locale, Record<StringKey, string>> = { en, ar };
 
-export const categoryLabels: Record<Locale, Record<Category, string>> = {
+// Missing keys fall back to English so the UI never shows a blank.
+const withFallback = (p: Partial<Record<StringKey, string>>) => ({ ...en, ...p }) as Record<StringKey, string>;
+
+export const strings: Record<Locale, Record<StringKey, string>> = {
+  en,
+  ar,
+  ur: withFallback(ur),
+  fa: withFallback(fa),
+  tr: withFallback(tr),
+  id: withFallback(id),
+  ms: withFallback(ms),
+  bn: withFallback(bn),
+  fr: withFallback(fr),
+  de: withFallback(de),
+};
+
+const baseCategoryLabels: Record<'en' | 'ar', Record<Category, string>> = {
   en: {
     health: 'Health',
     rizq: 'Rizq',
@@ -326,6 +398,11 @@ export const categoryLabels: Record<Locale, Record<Category, string>> = {
     family: 'الأسرة',
     other: 'أخرى',
   },
+};
+
+export const categoryLabels: Record<Locale, Record<Category, string>> = {
+  ...baseCategoryLabels,
+  ...categoryExtra,
 };
 
 export function format(template: string, vars: Record<string, string | number>) {

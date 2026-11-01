@@ -13,3 +13,6 @@ select cron.schedule(
   );
   $$
 );
+
+-- Daily cleanup at 03:17 UTC: keeps the database well under the free 500 MB.
+select cron.schedule('bilghayb-cleanup', '17 3 * * *', $$ select public.cleanup_old_rows(); $$);

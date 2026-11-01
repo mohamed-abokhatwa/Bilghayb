@@ -7,15 +7,16 @@ import { getLocales } from 'expo-localization';
 import { Chip, GoldButton, Ornament, Row, Txt } from '../components/ui';
 import { colors, fonts, gradients, radius, space } from '../theme';
 import { useApp } from '../lib/store';
-import { COUNTRIES } from '../lib/content';
-import type { Locale } from '../lib/i18n';
+import { COUNTRIES, countryName } from '../lib/content';
+import { Ionicons } from '@expo/vector-icons';
+import { HowSteps, LanguageGrid, RulesList } from '../components/Guide';
 import { scheduleReminders } from '../lib/notifications';
 import { isValidName } from '../lib/moderation';
 
-const STEPS = 4;
+const STEPS = 5; // language · hadith · how it works · rules · profile
 
 export default function Onboarding() {
-  const { t, prefs, setProfile, completeOnboarding, locale, rtl } = useApp();
+  const { t, prefs, completeOnboarding, locale, rtl } = useApp();
   const insets = useSafeAreaInsets();
   const [step, setStep] = useState(0);
   const [name, setName] = useState(prefs.profile.firstName ?? '');
@@ -50,25 +51,55 @@ export default function Onboarding() {
         style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 420 }}
       />
       <View style={[styles.top, { paddingTop: insets.top + space.md }]}>
+        <Pressable
+          onPress={() => step > 0 && setStep(step - 1)}
+          disabled={step === 0}
+          style={[styles.iconBtn, step === 0 && { opacity: 0 }]}
+          accessibilityRole="button"
+          accessibilityLabel={t('back')}
+          hitSlop={8}
+        >
+          <Ionicons name={rtl ? 'chevron-forward' : 'chevron-back'} size={18} color={colors.gold} />
+        </Pressable>
         <Row gap={6}>
           {Array.from({ length: STEPS }).map((_, i) => (
             <View key={i} style={[styles.dot, i === step && styles.dotActive]} />
           ))}
         </Row>
-        <Row gap={6}>
-          {(['en', 'ar'] as Locale[]).map((l) => (
-            <Pressable key={l} onPress={() => setProfile({ locale: l })} style={[styles.lang, locale === l && styles.langActive]}>
-              <Txt style={{ fontSize: 13, color: locale === l ? colors.bgDeep : colors.textMuted }}>
-                {l === 'en' ? 'EN' : 'ع'}
-              </Txt>
-            </Pressable>
-          ))}
-        </Row>
+        <Pressable
+          onPress={() => setStep(0)}
+          disabled={step === 0}
+          style={[styles.iconBtn, step === 0 && { opacity: 0 }]}
+          accessibilityRole="button"
+          accessibilityLabel={t('language')}
+          hitSlop={8}
+        >
+          <Ionicons name="globe-outline" size={18} color={colors.gold} />
+        </Pressable>
       </View>
 
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: space.lg }} keyboardShouldPersistTaps="handled">
         <Animated.View style={{ flex: 1, justifyContent: 'center', opacity: fade, transform: [{ translateY }] }}>
           {step === 0 && (
+            <View style={{ alignItems: 'center' }}>
+              <Txt v="arabic" style={{ fontSize: 56, lineHeight: 90, fontFamily: fonts.arabicBold }}>
+                بالغيب
+              </Txt>
+              <Txt v="label" center style={{ marginTop: 4 }}>
+                Bil-Ghayb
+              </Txt>
+              <Ornament style={{ width: 160 }} />
+              <Txt v="title" center style={{ marginBottom: 4 }}>
+                {t('chooseLanguage')}
+              </Txt>
+              <Txt v="small" center style={{ marginBottom: space.lg }}>
+                {t('langSub')}
+              </Txt>
+              <LanguageGrid />
+            </View>
+          )}
+
+          {step === 1 && (
             <View style={{ alignItems: 'center' }}>
               <Txt v="arabic" style={{ fontSize: 64, lineHeight: 100, fontFamily: fonts.arabicBold }}>
                 بالغيب
@@ -83,7 +114,7 @@ export default function Onboarding() {
               <Txt v="arabic" style={{ marginTop: space.lg, fontSize: 21 }}>
                 مَا مِنْ عَبْدٍ مُسْلِمٍ يَدْعُو لِأَخِيهِ بِظَهْرِ الْغَيْبِ إِلَّا قَالَ الْمَلَكُ: وَلَكَ بِمِثْلٍ
               </Txt>
-              {!rtl && (
+              {locale !== 'ar' && (
                 <Txt v="quote" center style={{ marginTop: space.md }}>
                   {t('ob1Body')}
                 </Txt>
@@ -94,10 +125,30 @@ export default function Onboarding() {
             </View>
           )}
 
-          {step === 1 && <Slide icon="☀︎" title={t('ob2Title')} body={t('ob2Body')} />}
-          {step === 2 && <Slide icon="✧" title={t('ob3Title')} body={t('ob3Body')} />}
+          {step === 2 && (
+            <View>
+              <Txt v="title" center>
+                {t('howTitle')}
+              </Txt>
+              <Ornament style={{ width: 160, alignSelf: 'center' }} />
+              <HowSteps />
+            </View>
+          )}
 
           {step === 3 && (
+            <View>
+              <Txt v="title" center>
+                {t('ob3Title')}
+              </Txt>
+              <Ornament style={{ width: 160, alignSelf: 'center' }} />
+              <Txt v="quote" center style={{ marginBottom: space.lg }}>
+                {t('ob3Body')}
+              </Txt>
+              <RulesList />
+            </View>
+          )}
+
+          {step === 4 && (
             <View>
               <Txt v="title" center style={{ marginBottom: space.xl }}>
                 {t('tagline')}
@@ -137,7 +188,7 @@ export default function Onboarding() {
                 {COUNTRIES.map((c) => (
                   <Chip
                     key={c.code}
-                    label={`${c.flag}  ${locale === 'ar' ? c.ar : c.en}`}
+                    label={`${c.flag}  ${countryName(c.code, locale)}`}
                     active={country === c.code}
                     onPress={() => setCountry(c.code)}
                   />
@@ -160,47 +211,19 @@ export default function Onboarding() {
   );
 }
 
-function Slide({ icon, title, body }: { icon: string; title: string; body: string }) {
-  return (
-    <View style={{ alignItems: 'center' }}>
-      <View style={styles.emblem}>
-        <Txt style={{ fontSize: 40, lineHeight: 48, color: colors.gold }}>{icon}</Txt>
-      </View>
-      <Txt v="display" center style={{ marginTop: space.xl }}>
-        {title}
-      </Txt>
-      <Ornament style={{ width: 160 }} />
-      <Txt v="quote" center>
-        {body}
-      </Txt>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   fill: { flex: 1, backgroundColor: colors.bg },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: space.lg },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.lineStrong },
   dotActive: { width: 22, backgroundColor: colors.gold },
-  lang: {
+  iconBtn: {
     width: 36,
-    height: 30,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: 36,
+    borderRadius: 18,
     borderWidth: 1,
     borderColor: colors.line,
-  },
-  langActive: { backgroundColor: colors.gold, borderColor: colors.gold },
-  emblem: {
-    width: 112,
-    height: 112,
-    borderRadius: 56,
-    borderWidth: 1,
-    borderColor: colors.lineStrong,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(214,186,124,0.06)',
   },
   input: {
     height: 54,

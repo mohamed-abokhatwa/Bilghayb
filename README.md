@@ -21,7 +21,8 @@ Each morning you get one stranger and their need. You pray for them, someone els
 | **Janazah** | Request and give dua for the deceased. |
 | **Reminders** | After Fajr, the last third of the night, and Friday's last hour. Works on the device, plus server pushes in live mode. |
 | **Private streak** | A streak only you can see. There are no leaderboards, to avoid showing off (riya). |
-| **English + Arabic** | Full right-to-left layout and Amiri font for Arabic. Language switches instantly with no restart. |
+| **10 languages** | Arabic, English, Urdu, Indonesian, Turkish, Bengali, French, Malay, Persian, German. Right-to-left layout for Arabic, Urdu and Persian. Picked on the first screen, changeable any time, no restart. Missing lines fall back to English. |
+| **Built-in guide** | Onboarding: language → hadith → how it works (4 steps) → rules → profile. The guide can be reopened from the Me tab. |
 | **Safety** | On-device rules, server rules, AI moderation, and 3 community reports auto-hide a need. |
 | **Privacy** | Anonymous sign-in with no email or phone. One tap deletes everything. |
 
@@ -61,6 +62,15 @@ npx eas-cli@latest build --profile development --platform android   # or ios
 7. Run `npx eas-cli@latest init` to get an EAS project ID for push notifications, then put it in `app.json → extra.eas.projectId`.
 
 The app detects the keys and switches from demo to live automatically. The version label in the Me tab shows which mode it's in.
+
+## Staying on the free database
+
+Supabase's free plan includes a 500 MB database, 50,000 monthly active users and 500,000 function calls a month. The app is built to stay inside it:
+- Totals and streaks are stored on each profile, so the prayer log can be trimmed.
+- A daily cleanup job (`cleanup_old_rows`, scheduled in `0002_cron.sql`) deletes prayer records older than 90 days and old daily assignments.
+- Rough size: about 180 bytes per prayer. With 10,000 people praying every day, the prayer log stays around 160 MB.
+
+Caveats of the free plan: a project with **no activity for 7 days is paused** (the hourly reminder job counts as activity), and there are **no automatic backups**. Upgrade to Pro ($25/month) only when you approach the limits.
 
 ## Publish to the stores
 

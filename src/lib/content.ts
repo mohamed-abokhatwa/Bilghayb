@@ -94,9 +94,25 @@ export const COUNTRIES: { code: string; en: string; ar: string; flag: string }[]
   { code: 'XX', en: 'Elsewhere', ar: 'مكان آخر', flag: '🌍' },
 ];
 
-export function countryName(code: string, locale: 'en' | 'ar') {
+const displayNames = new Map<string, Intl.DisplayNames | null>();
+
+/** Country name in the user's language (falls back to English if the device lacks Intl support). */
+export function countryName(code: string, locale: string) {
   const c = COUNTRIES.find((x) => x.code === code) ?? COUNTRIES[COUNTRIES.length - 1];
-  return locale === 'ar' ? c.ar : c.en;
+  if (locale === 'ar') return c.ar;
+  if (locale === 'en' || c.code === 'XX') return c.en;
+  if (!displayNames.has(locale)) {
+    try {
+      displayNames.set(locale, new Intl.DisplayNames([locale], { type: 'region' }));
+    } catch {
+      displayNames.set(locale, null);
+    }
+  }
+  try {
+    return displayNames.get(locale)?.of(c.code) ?? c.en;
+  } catch {
+    return c.en;
+  }
 }
 
 export function countryFlag(code: string) {

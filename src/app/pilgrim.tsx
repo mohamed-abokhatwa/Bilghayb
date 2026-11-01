@@ -52,7 +52,7 @@ export default function PilgrimScreen() {
 
   const dayLabel = (n: number) => (n === 0 ? t('today') : t('daysFromNow', { n }));
   const fmt = (iso: string) =>
-    new Date(iso).toLocaleDateString(locale === 'ar' ? 'ar' : 'en', { day: 'numeric', month: 'short' });
+    new Date(iso).toLocaleDateString(locale, { day: 'numeric', month: 'short' });
 
   return (
     <Screen bottomInset>

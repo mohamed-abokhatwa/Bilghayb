@@ -59,21 +59,48 @@ const arabicOverride: Partial<Record<Variant, TextStyle>> = {
   label: { fontFamily: fonts.arabicBold, fontSize: 13, lineHeight: 20, letterSpacing: 0, textTransform: 'none' },
 };
 
+// Scripts where wide letter-spacing and Latin display fonts break the letters apart.
+const complexScriptOverride: Partial<Record<Variant, TextStyle>> = {
+  label: { letterSpacing: 0, textTransform: 'none', fontSize: 13, lineHeight: 19 },
+  display: { letterSpacing: 0 },
+};
+
+const ARABIC_SCRIPT = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+const STRONG_CHAR = /[A-Za-z\u00C0-\u024F\u0980-\u09FF\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+
+/** Direction of a piece of user-written text, from its first letter. */
+export function textDirection(text: string): 'rtl' | 'ltr' {
+  const m = text.match(STRONG_CHAR);
+  return m && ARABIC_SCRIPT.test(m[0]) ? 'rtl' : 'ltr';
+}
+
 export const Txt = memo(function Txt({
   v = 'body',
   style,
   center,
   color,
+  auto,
   ...rest
-}: TextProps & { v?: Variant; center?: boolean; color?: string }) {
-  const { rtl } = useApp();
+}: TextProps & {
+  v?: Variant;
+  center?: boolean;
+  color?: string;
+  /** User-written content: follow the text's own direction, not the app language. */
+  auto?: boolean;
+}) {
+  const { rtl, locale } = useApp();
+  let dirRtl = rtl;
+  if (auto && typeof rest.children === 'string') dirRtl = textDirection(rest.children) === 'rtl';
+  // Fonts follow the text's script: Amiri for Arabic script, Latin fonts otherwise.
+  const arabicFont = auto ? dirRtl : rtl;
   return (
     <RNText
       {...rest}
       style={[
         variantStyle[v],
-        rtl && arabicOverride[v],
-        { writingDirection: rtl ? 'rtl' : 'ltr', textAlign: center ? 'center' : rtl ? 'right' : 'left' },
+        arabicFont && arabicOverride[v],
+        locale === 'bn' && complexScriptOverride[v],
+        { writingDirection: dirRtl ? 'rtl' : 'ltr', textAlign: center ? 'center' : dirRtl ? 'right' : 'left' },
         v === 'arabic' && { textAlign: 'center', writingDirection: 'rtl' },
         color ? { color } : null,
         style,

@@ -41,7 +41,7 @@ export default function JanazahScreen() {
         <Txt v="arabic" style={{ marginTop: space.sm }}>
           {t('janazahDuaAr')}
         </Txt>
-        {locale === 'en' && (
+        {locale !== 'ar' && (
           <Txt v="small" center style={{ fontStyle: 'italic' }}>
             {t('janazahDua')}
           </Txt>

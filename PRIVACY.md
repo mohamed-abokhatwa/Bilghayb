@@ -54,7 +54,8 @@ These providers process data only to provide their service to us.
 ## 6. How long we keep data
 
 - **Needs** stop being shown to new people after 60 days (janazah requests after 40 days). They stay in your "My needs" list until you delete your account.
-- **Prayer records and reports** are kept while your account exists.
+- **Prayer records** (who prayed for which need) are deleted automatically after 90 days. Only running totals (how many duas you made and received) are kept on your profile.
+- **Reports** are kept while your account exists.
 - **When you delete your account** (Me → "Delete my account & data"), we permanently delete your profile, needs, prayers, reports and push token right away. This cannot be undone.
 - If you uninstall the app without deleting your account, your anonymous account remains, but nothing links it to you personally.
 

@@ -9,12 +9,14 @@ returns boolean language sql immutable as $$
   select t is not null and (
     t ~ '[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+'
     or t ~ '(^|[[:space:]])@[^[:space:]]{2,}'
-    or t ~ '([0-9٠-٩۰-۹][[:space:]().\-/]*){6,}'
+    or t ~ '([0-9٠-٩۰-۹০-৯][[:space:]().\-/]*){6,}'
     or t ~ '\+[[:space:]]*[0-9٠-٩]{2,}'
     or t ~* '(https?://|www\.|whats ?app|wa\.me|telegram|t\.me|viber|snap ?chat|instagram|facebook|messenger|tik ?tok|twitter|linkedin|discord|skype|wechat)'
     or t ~ '(واتس|وتساب|تلغرام|تليجرام|سناب|انستا|انستقرام|فيسبوك|تويتر|تيك توك|ماسنجر)'
     or t ~* '(call me|text me|message me|dm me|contact me|my number|my phone|my email)'
     or t ~ '(كلموني|كلمني|راسلوني|راسلني|تواصلوا|تواصل معي|رقمي|رقم جوالي|ايميلي)'
+    or t ~ '(میرا نمبر|رابطہ کریں|مجھ سے رابطہ|شماره من|با من تماس|আমার নম্বর|আমার নাম্বার|যোগাযোগ করুন)'
+    or t ~* '(numaram|beni ara|bana ulaş|hubungi saya|nomor saya|nombor saya|appelez-moi|mon numéro|contactez-moi|ruf mich an|meine nummer)'
   );
 $$;
 
@@ -25,11 +27,16 @@ create table public.profiles (
   first_name text check (char_length(first_name) <= 40),
   gender char(1) check (gender in ('f','m')),
   country char(2) not null default 'XX',
-  locale text not null default 'en' check (locale in ('en','ar')),
+  locale text not null default 'en' check (locale in ('en','ar','ur','fa','tr','id','ms','bn','fr','de')),
   tz text not null default 'UTC',
   push_token text,
   notif_morning boolean not null default true,
   notif_special boolean not null default true,
+  -- Running totals, so old prayer rows can be deleted (keeps the free database small).
+  prayers_made integer not null default 0,
+  prayed_for_me integer not null default 0,
+  streak integer not null default 0,
+  last_prayed_day date,
   created_at timestamptz not null default now()
 );
 
@@ -214,6 +221,18 @@ begin
   get diagnostics inserted = row_count;
   if inserted > 0 then
     update needs set prayed_count = prayed_count + 1 where id = p_need;
+    -- the author's "prayed for me" total
+    update profiles set prayed_for_me = prayed_for_me + 1
+      where id = (select author_id from needs where id = p_need);
+    -- my totals and streak (a missed day resets it)
+    update profiles set
+      prayers_made = prayers_made + 1,
+      streak = case
+        when last_prayed_day = user_today(uid) then streak
+        when last_prayed_day = user_today(uid) - 1 then streak + 1
+        else 1 end,
+      last_prayed_day = user_today(uid)
+    where id = uid;
   end if;
 
   update assignments set prayed_at = coalesce(prayed_at, now())
@@ -221,23 +240,11 @@ begin
 end $$;
 
 create or replace function public.my_streak()
-returns int language plpgsql stable security definer set search_path = public as $$
-declare
-  uid uuid := auth.uid();
-  tz text := coalesce((select p.tz from profiles p where p.id = uid), 'UTC');
-  d date := user_today(uid);
-  n int := 0;
-begin
+returns int language sql stable security definer set search_path = public as $$
   -- Today not done yet does not break the streak.
-  if not exists (select 1 from prayers where user_id = uid and (created_at at time zone tz)::date = d) then
-    d := d - 1;
-  end if;
-  while exists (select 1 from prayers where user_id = uid and (created_at at time zone tz)::date = d) loop
-    n := n + 1;
-    d := d - 1;
-  end loop;
-  return n;
-end $$;
+  select case when last_prayed_day >= user_today(auth.uid()) - 1 then streak else 0 end
+  from profiles where id = auth.uid();
+$$;
 
 create or replace function public.my_stats()
 returns json language sql stable security definer set search_path = public as $$
@@ -248,10 +255,10 @@ returns json language sql stable security definer set search_path = public as $$
   )
   select json_build_object(
     'prayedForMeWeek', (select count(*) from week),
-    'prayedForMeTotal', (select count(*) from prayers p join mine m on m.id = p.need_id),
+    'prayedForMeTotal', (select prayed_for_me from profiles where id = auth.uid()),
     'countriesWeek', coalesce((select json_agg(distinct country) from week), '[]'::json),
-    'myPrayersTotal', (select count(*) from prayers where user_id = auth.uid()),
-    'streak', my_streak()
+    'myPrayersTotal', (select prayers_made from profiles where id = auth.uid()),
+    'streak', coalesce(my_streak(), 0)
   );
 $$;
 
@@ -353,3 +360,15 @@ grant execute on function public.get_daily_person, public.mark_prayed, public.my
   public.janazah_list, public.start_trip, public.mark_trip_read, public.end_trip, public.report_need,
   public.delete_my_account to authenticated;
 grant select on public.needs_public to authenticated;
+
+
+-- ───────────────────────── Housekeeping (stay inside the free tier) ─────────────────────────
+-- Needs leave the daily pool after 60 days, so prayer rows older than 90 days are no longer
+-- needed: totals and streaks live on profiles. Old daily assignments are deleted too.
+create or replace function public.cleanup_old_rows()
+returns void language sql security definer set search_path = public as $$
+  delete from prayers where created_at < now() - interval '90 days';
+  delete from assignments where day < current_date - 14;
+  delete from pilgrim_trips where ended and created_at < now() - interval '30 days';
+$$;
+revoke all on function public.cleanup_old_rows from public, anon, authenticated;

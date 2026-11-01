@@ -153,8 +153,8 @@ export default function TodayScreen() {
 
               <Ornament />
 
-              <Txt v="quote" center>
-                “{need.body}”
+              <Txt v="quote" center auto>
+                {`“${need.body}”`}
               </Txt>
 
               <View style={{ marginTop: space.xl }}>
@@ -209,7 +209,7 @@ export default function TodayScreen() {
             <Txt v="arabic" style={{ marginTop: space.md }}>
               {dua.ar}
             </Txt>
-            {locale === 'en' && (
+            {locale !== 'ar' && (
               <Txt v="small" center style={{ marginTop: space.sm, fontStyle: 'italic' }}>
                 {dua.en}
               </Txt>

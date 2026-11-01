@@ -11,7 +11,7 @@ export function personName(n: Pick<Need, 'firstName' | 'gender'>, t: ReturnType<
   return n.gender === 'f' ? t('anonSister') : n.gender === 'm' ? t('anonBrother') : t('anonPerson');
 }
 
-export function timeAgo(iso: string, locale: 'en' | 'ar') {
+export function timeAgo(iso: string, locale: string) {
   const s = Math.max(1, (Date.now() - new Date(iso).getTime()) / 1000);
   const units: [Intl.RelativeTimeFormatUnit, number][] = [
     ['day', 86400],
@@ -61,14 +61,14 @@ export const NeedCard = memo(function NeedCard({
           </Txt>
         </View>
       </Row>
-      <Txt style={{ marginTop: space.md }}>{need.body}</Txt>
+      <Txt auto style={{ marginTop: space.md }}>{need.body}</Txt>
       {showAnswer && need.answeredNote ? (
         <View style={styles.answer}>
           <Txt v="label" style={{ marginBottom: 6 }}>
             {t('alhamdulillah')}
           </Txt>
-          <Txt v="quote" style={{ fontSize: 19, lineHeight: 28 }}>
-            “{need.answeredNote}”
+          <Txt v="quote" auto style={{ fontSize: 19, lineHeight: 28 }}>
+            {`“${need.answeredNote}”`}
           </Txt>
         </View>
       ) : null}

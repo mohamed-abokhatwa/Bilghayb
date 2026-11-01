@@ -9,14 +9,17 @@ import { colors, fonts, radius, space } from '../../theme';
 import { useApp, useLoad } from '../../lib/store';
 import { scheduleReminders } from '../../lib/notifications';
 import { checkShortText } from '../../lib/moderation';
+import { LANGUAGES } from '../../lib/i18n';
+import { LanguageGrid } from '../../components/Guide';
 import type { Need } from '../../lib/types';
 
 export default function MeScreen() {
-  const { t, api, prefs, setPrefs, setProfile, reset, locale, touch, rtl } = useApp();
+  const { t, api, prefs, setPrefs, reset, locale, touch, rtl } = useApp();
   const needs = useLoad((a) => a.myNeeds());
   const stats = useLoad((a) => a.getStats());
   const [answering, setAnswering] = useState<Need | null>(null);
   const [note, setNote] = useState('');
+  const [langOpen, setLangOpen] = useState(false);
 
   const toggle = async (key: 'notifMorning' | 'notifSpecial', v: boolean) => {
     await setPrefs({ [key]: v });
@@ -111,26 +114,28 @@ export default function MeScreen() {
         {t('settings')}
       </Txt>
       <Card>
-        <Row style={{ justifyContent: 'space-between' }}>
-          <Txt>{t('language')}</Txt>
-          <Row gap={6}>
-            {(['en', 'ar'] as const).map((l) => (
-              <Pressable
-                key={l}
-                onPress={() => {
-                  haptic.select();
-                  setProfile({ locale: l });
-                  scheduleReminders(l, prefs.notifMorning, prefs.notifSpecial).catch(() => {});
-                }}
-                style={[styles.lang, locale === l && styles.langActive]}
-              >
-                <Txt style={{ fontSize: 14, color: locale === l ? colors.bgDeep : colors.text }}>
-                  {l === 'en' ? 'English' : 'العربية'}
-                </Txt>
-              </Pressable>
-            ))}
+        <Pressable onPress={() => setLangOpen(true)} accessibilityRole="button">
+          <Row style={{ justifyContent: 'space-between' }}>
+            <Row gap={10}>
+              <Ionicons name="globe-outline" size={18} color={colors.gold} />
+              <Txt>{t('language')}</Txt>
+            </Row>
+            <Row gap={6}>
+              <Txt style={{ color: colors.goldBright }}>{LANGUAGES.find((l) => l.code === locale)?.native}</Txt>
+              <Ionicons name={rtl ? 'chevron-back' : 'chevron-forward'} size={16} color={colors.textFaint} />
+            </Row>
           </Row>
-        </Row>
+        </Pressable>
+        <Divider />
+        <Pressable onPress={() => router.push('/guide')} accessibilityRole="button">
+          <Row style={{ justifyContent: 'space-between' }}>
+            <Row gap={10}>
+              <Ionicons name="book-outline" size={18} color={colors.gold} />
+              <Txt>{t('howItWorks')}</Txt>
+            </Row>
+            <Ionicons name={rtl ? 'chevron-back' : 'chevron-forward'} size={16} color={colors.textFaint} />
+          </Row>
+        </Pressable>
         <Divider />
         <Txt v="label" style={{ marginBottom: space.sm }}>
           {t('notifications')}
@@ -157,6 +162,15 @@ export default function MeScreen() {
       <Txt v="small" center style={{ fontSize: 11, color: colors.textFaint }}>
         {t('appName')} · v1.0 · {api.mode}
       </Txt>
+
+      <Sheet visible={langOpen} onClose={() => setLangOpen(false)} title={t('chooseLanguage')}>
+        <LanguageGrid
+          onPick={(l) => {
+            scheduleReminders(l, prefs.notifMorning, prefs.notifSpecial).catch(() => {});
+            setTimeout(() => setLangOpen(false), 250);
+          }}
+        />
+      </Sheet>
 
       <Sheet visible={!!answering} onClose={() => setAnswering(null)} title={t('alhamdulillah')}>
         <Txt v="small" center style={{ marginBottom: space.md }}>

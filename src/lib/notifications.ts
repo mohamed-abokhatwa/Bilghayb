@@ -62,12 +62,12 @@ export async function scheduleReminders(locale: Locale, morning: boolean, specia
   if (special) {
     // Last third of the night (approx.)
     await Notifications.scheduleNotificationAsync({
-      content: { title: s.specialTime, body: locale === 'ar' ? 'ينزل ربنا في الثلث الأخير من الليل.' : 'Our Lord descends in the last third of the night.' },
+      content: { title: s.specialTime, body: s.notifNightBody },
       trigger: { type: Notifications.SchedulableTriggerInputTypes.DAILY, hour: 3, minute: 30, ...channel },
     });
     // Friday, last hour before Maghrib (approx.). Weekday: 1 = Sunday … 6 = Friday.
     await Notifications.scheduleNotificationAsync({
-      content: { title: s.specialTime, body: locale === 'ar' ? 'آخر ساعة من يوم الجمعة.' : 'The last hour of Friday.' },
+      content: { title: s.specialTime, body: s.notifFridayBody },
       trigger: { type: Notifications.SchedulableTriggerInputTypes.WEEKLY, weekday: 6, hour: 17, minute: 0, ...channel },
     });
   }

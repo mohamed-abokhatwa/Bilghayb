@@ -67,6 +67,7 @@ function Root() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="pilgrim" options={{ animation: 'slide_from_bottom' }} />
         <Stack.Screen name="janazah" options={{ animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="guide" options={{ animation: 'slide_from_bottom' }} />
       </Stack>
     </>
   );

@@ -1,3 +1,4 @@
+import type { Locale } from '../lib/i18n';
 import type {
   Need,
   NewNeedInput,
@@ -12,7 +13,7 @@ export interface Profile {
   firstName: string | null;
   gender: 'f' | 'm' | null;
   country: string;
-  locale: 'en' | 'ar';
+  locale: Locale;
 }
 
 export interface Api {
