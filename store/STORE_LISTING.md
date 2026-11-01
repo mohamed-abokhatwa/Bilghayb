@@ -13,9 +13,9 @@ Everything you type into App Store Connect and Google Play Console. Screenshots 
 | Bundle ID / package | `com.abokhatwa.bilghayb` |
 | Category | Lifestyle (secondary: Social Networking) |
 | Price | Free, no in-app purchases, no ads |
-| Support URL | https://mohamed-abokhatwa.github.io/Bilghayb/ |
-| Privacy policy URL | https://mohamed-abokhatwa.github.io/Bilghayb/privacy.html |
-| Terms (EULA) URL | https://mohamed-abokhatwa.github.io/Bilghayb/terms.html |
+| Support URL | https://abokhatwa.com/Bilghayb/ |
+| Privacy policy URL | https://abokhatwa.com/Bilghayb/privacy.html |
+| Terms (EULA) URL | https://abokhatwa.com/Bilghayb/terms.html |
 | Support email | mohamed.abokhatwa@hotmail.com |
 | Copyright | © 2026 Mohamed Abokhatwa |
 

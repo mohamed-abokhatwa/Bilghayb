@@ -38,9 +38,9 @@ The stores need public links to the privacy policy, terms and support page. They
 1. On GitHub, open the repository → **Settings → General → Danger Zone → Change visibility → Public**. GitHub Pages is free only for public repositories. There are no secrets in the code: the database key the app uses is designed to be public, and the database is protected by its security rules.
 2. **Settings → Pages** → Source: **Deploy from a branch** → Branch: `main`, folder: `/docs` → **Save**.
 3. After about a minute, check these open:
-   - https://mohamed-abokhatwa.github.io/Bilghayb/
-   - https://mohamed-abokhatwa.github.io/Bilghayb/privacy.html
-   - https://mohamed-abokhatwa.github.io/Bilghayb/terms.html
+   - https://abokhatwa.com/Bilghayb/
+   - https://abokhatwa.com/Bilghayb/privacy.html
+   - https://abokhatwa.com/Bilghayb/terms.html
 
 If you prefer to keep the repository private, put the three pages on any free host (Netlify Drop, Google Sites) and change the links in `src/lib/links.ts` and `store/STORE_LISTING.md`.
 

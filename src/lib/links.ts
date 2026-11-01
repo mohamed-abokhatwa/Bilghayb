@@ -1,5 +1,5 @@
 // Public pages (GitHub Pages, from the docs/ folder) and support contact.
-const SITE = 'https://mohamed-abokhatwa.github.io/Bilghayb';
+const SITE = 'https://abokhatwa.com/Bilghayb';
 
 export const LINKS = {
   privacy: `${SITE}/privacy.html`,
