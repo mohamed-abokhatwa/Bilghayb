@@ -2,7 +2,7 @@
 // Deploy: supabase functions deploy submit-need
 // Secrets: supabase secrets set ANTHROPIC_API_KEY=... (optional MODERATION_MODEL)
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import Anthropic from 'npm:@anthropic-ai/sdk';
+import Anthropic from 'npm:@anthropic-ai/sdk@1';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
