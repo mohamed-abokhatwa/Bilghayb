@@ -10,6 +10,7 @@
   },
   "exclude": [
     "supabase/functions",
+    "supabase/dashboard",
     "node_modules"
   ]
 }
