@@ -29,7 +29,7 @@ function isSpecialTime() {
 }
 
 export default function TodayScreen() {
-  const { t, locale, cat, api, prefs, touch, rtl } = useApp();
+  const { t, locale, cat, api, prefs, touch, rtl, isHidden } = useApp();
   const insets = useSafeAreaInsets();
   const today = useLoad<Today>((a) => a.getToday());
   const stats = useLoad<Stats>((a) => a.getStats());
@@ -57,7 +57,8 @@ export default function TodayScreen() {
     }
   }, [api, today.data, thanks, stats]);
 
-  const need = today.data?.need ?? null;
+  // A reported or blocked person disappears at once; the server then picks a new one.
+  const need = today.data?.need && !isHidden(today.data.need.id) ? today.data.need : null;
   const prayed = justPrayed || !!today.data?.prayed;
   const dua = need ? duaByCategory[need.category] : null;
   const s = stats.data;
