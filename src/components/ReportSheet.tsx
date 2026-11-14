@@ -15,12 +15,13 @@ const REASONS: { r: ReportReason; k: 'reportSpam' | 'reportMoney' | 'reportInapp
 ];
 
 export function ReportSheet({ needId, onClose }: { needId: string | null; onClose: () => void }) {
-  const { t, api, touch } = useApp();
+  const { t, api, touch, hideNeed } = useApp();
   const [sent, setSent] = useState<false | 'reported' | 'blocked'>(false);
 
   const send = async (r: ReportReason) => {
     if (!needId) return;
     haptic.medium();
+    hideNeed(needId); // gone from this user's feed immediately
     await api.report(needId, r).catch(() => {});
     setSent('reported');
     setTimeout(() => {
@@ -33,6 +34,7 @@ export function ReportSheet({ needId, onClose }: { needId: string | null; onClos
   const block = async () => {
     if (!needId) return;
     haptic.medium();
+    hideNeed(needId);
     await api.block(needId).catch(() => {});
     setSent('blocked');
     setTimeout(() => {
@@ -50,6 +52,7 @@ export function ReportSheet({ needId, onClose }: { needId: string | null; onClos
         </Txt>
       ) : (
         <View>
+          <Txt v="small" style={{ marginBottom: space.sm }}>{t('reportNote')}</Txt>
           {REASONS.map(({ r, k }) => (
             <Pressable key={r} onPress={() => send(r)} style={styles.row} accessibilityRole="button">
               <Txt>{t(k)}</Txt>

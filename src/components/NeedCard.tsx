@@ -43,7 +43,8 @@ export const NeedCard = memo(function NeedCard({
   /** Shows a ⋯ menu to report or block (for other people's needs). */
   onReport?: (needId: string) => void;
 }) {
-  const { t, cat, locale } = useApp();
+  const { t, cat, locale, isHidden } = useApp();
+  if (isHidden(need.id)) return null;
   return (
     <Card style={{ marginBottom: space.md }}>
       <Row style={{ justifyContent: 'space-between' }}>
