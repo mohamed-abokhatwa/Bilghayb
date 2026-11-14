@@ -147,11 +147,11 @@ Not collected: contact info, health, financial, precise location, contacts, brow
 
 **Apple age rating questionnaire:** every category "None", except:
 - *User-generated content*: Yes (moderated, with reporting and blocking)
-- Result: **12+** (Apple's usual result for apps with user content)
+- Result: override to **18+** (Apple requires 18+ for apps where people can post anonymously; Guideline 1.2)
 
 **Google IARC questionnaire:** Category "Social / communication"; users can interact (no chat, but user-written content is shown); content is moderated. Typical result: **Teen / 12+**.
 
-**Target audience (Google):** 13 and over. Not designed for children.
+**Target audience (Google):** 18 and over. Not designed for children.
 
 ---
 
