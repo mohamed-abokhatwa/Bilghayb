@@ -16,6 +16,10 @@ export interface Prefs {
   profile: Profile;
   notifMorning: boolean;
   notifSpecial: boolean;
+  /** Accepted the Terms of Use (18+, zero tolerance) — required before using the app. */
+  termsAccepted: boolean;
+  /** Posts this user reported or hid; removed from every list on this device at once. */
+  hiddenNeeds: string[];
 }
 
 function createApi(): Api | null {
@@ -41,6 +45,8 @@ const defaults = (): Prefs => ({
   profile: { firstName: null, gender: null, country: 'XX', locale: deviceLocale() },
   notifMorning: true,
   notifSpecial: true,
+  termsAccepted: false,
+  hiddenNeeds: [],
 });
 
 interface Ctx {
@@ -54,6 +60,10 @@ interface Ctx {
   setPrefs: (p: Partial<Prefs>) => Promise<void>;
   setProfile: (p: Partial<Profile>) => Promise<void>;
   completeOnboarding: (p: Profile) => Promise<void>;
+  acceptTerms: () => Promise<void>;
+  /** Removes a post from this user's view immediately (used by report and block). */
+  hideNeed: (needId: string) => void;
+  isHidden: (needId: string) => boolean;
   reset: () => Promise<void>;
   /** Bumped whenever data changes so screens can refetch. */
   version: number;
@@ -82,6 +92,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const raw = await AsyncStorage.getItem(PREFS_KEY);
         if (raw) {
           const saved = { ...defaults(), ...JSON.parse(raw) } as Prefs;
+          if (!Array.isArray(saved.hiddenNeeds)) saved.hiddenNeeds = [];
           if (!isLocale(saved.profile.locale)) saved.profile.locale = 'en';
           setPrefsState(saved);
         }
@@ -111,7 +122,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const completeOnboarding = useCallback(
     async (profile: Profile) => {
       await api.init(profile).catch(() => {});
-      persist({ ...prefs, profile, onboarded: true });
+      persist({ ...prefs, profile, onboarded: true, termsAccepted: true });
+    },
+    [prefs, persist],
+  );
+
+  const acceptTerms = useCallback(async () => persist({ ...prefs, termsAccepted: true }), [prefs, persist]);
+
+  const hideNeed = useCallback(
+    (needId: string) => {
+      if (prefs.hiddenNeeds.includes(needId)) return;
+      // Keep the list bounded; old entries expire from the feeds anyway.
+      persist({ ...prefs, hiddenNeeds: [...prefs.hiddenNeeds, needId].slice(-500) });
     },
     [prefs, persist],
   );
@@ -137,11 +159,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setPrefs,
       setProfile,
       completeOnboarding,
+      acceptTerms,
+      hideNeed,
+      isHidden: (id) => prefs.hiddenNeeds.includes(id),
       reset,
       version,
       touch: () => setVersion((v) => v + 1),
     }),
-    [ready, prefs, locale, rtl, setPrefs, setProfile, completeOnboarding, reset, version],
+    [ready, prefs, locale, rtl, setPrefs, setProfile, completeOnboarding, acceptTerms, hideNeed, reset, version],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
