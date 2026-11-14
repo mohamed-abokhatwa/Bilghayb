@@ -3,5 +3,6 @@ import { useApp } from '../lib/store';
 
 export default function Index() {
   const { prefs } = useApp();
-  return <Redirect href={prefs.onboarded ? '/(tabs)' : '/onboarding'} />;
+  if (!prefs.onboarded) return <Redirect href="/onboarding" />;
+  return <Redirect href={prefs.termsAccepted ? '/(tabs)' : '/accept-terms'} />;
 }

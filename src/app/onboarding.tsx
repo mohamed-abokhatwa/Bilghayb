@@ -28,6 +28,7 @@ export default function Onboarding() {
     return COUNTRIES.some((c) => c.code === region) ? region! : prefs.profile.country;
   });
   const [busy, setBusy] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const fade = useState(() => new Animated.Value(0))[0];
 
   useEffect(() => {
@@ -204,9 +205,17 @@ export default function Onboarding() {
       <View style={[{ padding: space.lg, paddingBottom: insets.bottom + space.lg }, column]}>
         {step === STEPS - 1 && (
           <View style={{ marginBottom: space.md }}>
-            <Txt v="small" center style={{ fontSize: 12, lineHeight: 18 }}>
-              {t('agreeTerms')}
-            </Txt>
+            <Pressable
+              onPress={() => setAgreed(!agreed)}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: agreed }}
+              style={{ flexDirection: rtl ? 'row-reverse' : 'row', alignItems: 'flex-start', gap: 10 }}
+            >
+              <Ionicons name={agreed ? 'checkbox' : 'square-outline'} size={22} color={colors.gold} />
+              <Txt v="small" style={{ flex: 1, fontSize: 12, lineHeight: 18 }}>
+                {t('iAgreeTerms')}
+              </Txt>
+            </Pressable>
             <Row gap={space.md} style={{ justifyContent: 'center', marginTop: 6 }}>
               <ExternalLink href={LINKS.terms} label={t('terms')}>
                 <Txt v="small" style={{ fontSize: 12, color: colors.gold, textDecorationLine: 'underline' }}>{t('terms')}</Txt>
@@ -221,7 +230,7 @@ export default function Onboarding() {
           label={step === STEPS - 1 ? t('begin') : t('continue')}
           onPress={next}
           loading={busy}
-          disabled={step === STEPS - 1 && !isValidName(name)}
+          disabled={step === STEPS - 1 && (!isValidName(name) || !agreed)}
         />
       </View>
     </View>

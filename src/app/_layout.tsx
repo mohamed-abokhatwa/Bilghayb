@@ -77,6 +77,7 @@ function Root() {
       >
         <Stack.Screen name="index" />
         <Stack.Screen name="onboarding" options={{ animation: 'fade' }} />
+        <Stack.Screen name="accept-terms" options={{ animation: 'fade', gestureEnabled: false }} />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="pilgrim" options={{ animation: 'slide_from_bottom' }} />
         <Stack.Screen name="janazah" options={{ animation: 'slide_from_bottom' }} />
